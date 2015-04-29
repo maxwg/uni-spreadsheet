@@ -1,3 +1,5 @@
+package gui;
+
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -19,6 +21,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import data.Cell;
+import data.CellIndex;
+import data.WorkSheet;
+
 public class Spreadsheet implements Runnable, ActionListener,
 		SelectionObserver, DocumentListener {
 
@@ -34,11 +40,11 @@ public class Spreadsheet implements Runnable, ActionListener,
 	private static final String EDITFUNCTIONCOMMAND = "editfunctioncommand";
 
 	JFrame jframe;
-	WorksheetView worksheetview;
-	FunctionEditor functioneditor;
-	WorkSheet worksheet;
-	JButton calculateButton;
-	JTextField cellEditTextField;
+	public WorksheetView worksheetview;
+	public FunctionEditor functioneditor;
+	public WorkSheet worksheet;
+	public JButton calculateButton;
+	public JTextField cellEditTextField;
 	JLabel selectedCellLabel;
 	JFileChooser filechooser = new JFileChooser();
 

@@ -1,3 +1,4 @@
+package gui;
 
 /**
  * SelectionObserver - enables a class to register itself to be informed of selection events.

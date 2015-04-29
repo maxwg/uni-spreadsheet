@@ -1,11 +1,16 @@
+package testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import gui.Spreadsheet;
 
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
+
+import data.CellIndex;
 
 /**
  * 

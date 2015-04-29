@@ -1,3 +1,7 @@
+package gui;
+
+
+
 import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -9,6 +13,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import data.Cell;
+import data.CellIndex;
+import data.WorkSheet;
 
 public class WorksheetView extends JTable implements TableModel {
 

@@ -1,3 +1,4 @@
+package gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import data.WorkSheet;
 
 public class FunctionEditor extends JDialog implements ActionListener {
 /**
@@ -17,7 +20,7 @@ public class FunctionEditor extends JDialog implements ActionListener {
 	
 	
 	WorkSheet worksheet;
-	JTextArea textarea;
+	public JTextArea textarea;
 
 	public FunctionEditor(WorkSheet worksheet) {
 		this.worksheet = worksheet;

@@ -1,3 +1,4 @@
+package data;
 /**
  * Cell - an object of this class holds the data of a single cell. 
  * 
