@@ -1,7 +1,5 @@
 package gui;
 
-
-
 import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -9,11 +7,14 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import modernUIElements.OJLabel;
 import data.Cell;
 import data.CellIndex;
 import data.WorkSheet;
@@ -25,9 +26,9 @@ public class WorksheetView extends JTable implements TableModel {
 	private static final int FIRSTCOLUMNWIDTH = 20;
 	private static final int COLUMNWIDTH = 50;
 
-	/** 
-	 * WorksheetView - This is the GUI view of a worksheet.  It builds on and modifies the JTable
-	 * Eric McCreath 2015
+	/**
+	 * WorksheetView - This is the GUI view of a worksheet. It builds on and
+	 * modifies the JTable Eric McCreath 2015
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -52,13 +53,24 @@ public class WorksheetView extends JTable implements TableModel {
 				ListSelectionModel.SINGLE_SELECTION);
 		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		for (int col = 0; col < NUMCOL + 1; col++) {
-			this.getColumnModel().getColumn(col)
-					.setPreferredWidth(col == 0 ? FIRSTCOLUMNWIDTH : COLUMNWIDTH);
+			this.getColumnModel()
+					.getColumn(col)
+					.setPreferredWidth(
+							col == 0 ? FIRSTCOLUMNWIDTH : COLUMNWIDTH);
 		}
+
+		DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+		headerRenderer.setBackground(new Color(24, 24, 100));
+		headerRenderer.setForeground(new Color(240, 240, 240));
+		headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		for (int i = 0; i < getModel().getColumnCount(); i++) {
+			getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+		}
+		setBackground(new Color(250, 250, 250));
 	}
 
-	
-	// getCellRenderer - provides the renderers for the cells.  Note the first column is just the index.
+	// getCellRenderer - provides the renderers for the cells. Note the first
+	// column is just the index.
 	public TableCellRenderer getCellRenderer(int row, int column) {
 		if ((column == 0)) {
 			return new TableCellRenderer() {
@@ -67,9 +79,11 @@ public class WorksheetView extends JTable implements TableModel {
 				public Component getTableCellRendererComponent(JTable table,
 						Object value, boolean isSelected, boolean hasFocus,
 						int row, int column) {
-					JLabel lab = new JLabel("" + (row + 1));
+					JLabel lab = new OJLabel("" + (row + 1), 12);
 					lab.setOpaque(true);
-					lab.setBackground(Color.gray);
+					lab.setHorizontalAlignment(SwingConstants.CENTER);
+					lab.setBackground(new Color(24, 24, 100));
+					lab.setForeground(new Color(240, 240, 240));
 					return lab;
 
 				}
@@ -81,13 +95,13 @@ public class WorksheetView extends JTable implements TableModel {
 			public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
-				JLabel lab = new JLabel("" + ((Cell) value).show());
+				JLabel lab = new OJLabel("" + ((Cell) value).show(), 12);
 				if (isSelected
 						|| hasFocus
 						|| (table.getSelectedColumn() == column && table
 								.getSelectedRow() == row)) {
 					lab.setOpaque(true);
-					lab.setBackground(Color.lightGray);
+					lab.setBackground(new Color(220, 220, 220));
 				}
 				return lab;
 

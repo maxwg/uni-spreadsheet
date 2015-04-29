@@ -1,11 +1,12 @@
 package gui;
 
-
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -15,12 +16,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import modernUIElements.ModernButton;
+import modernUIElements.ModernJTextField;
+import modernUIElements.ModernScrollPane;
+import modernUIElements.OJLabel;
 import data.Cell;
 import data.CellIndex;
 import data.WorkSheet;
@@ -57,48 +61,56 @@ public class Spreadsheet implements Runnable, ActionListener,
 	}
 
 	public void run() {
-		jframe = new JFrame("Spreadsheet");
-		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		try {
+			jframe = new JFrame("Spreadsheet");
+			jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			jframe.setBackground(new Color(24,24,24));
+			// set up the menu bar
+			JMenuBar bar = new JMenuBar();
+			JMenu menu = new JMenu("File");
+			bar.add(menu);
+			makeMenuItem(menu, "New", CLEARCOMMAND);
+			makeMenuItem(menu, "Open", OPENCOMMAND);
+			makeMenuItem(menu, "Save", SAVECOMMAND);
+			makeMenuItem(menu, "Exit", EXITCOMMAND);
+			menu = new JMenu("Edit");
+			bar.add(menu);
+			makeMenuItem(menu, "EditFunction", EDITFUNCTIONCOMMAND);
 
-		// set up the menu bar
-		JMenuBar bar = new JMenuBar();
-		JMenu menu = new JMenu("File");
-		bar.add(menu);
-		makeMenuItem(menu, "New", CLEARCOMMAND);
-		makeMenuItem(menu, "Open", OPENCOMMAND);
-		makeMenuItem(menu, "Save", SAVECOMMAND);
-		makeMenuItem(menu, "Exit", EXITCOMMAND);
-		menu = new JMenu("Edit");
-		bar.add(menu);
-		makeMenuItem(menu, "EditFunction", EDITFUNCTIONCOMMAND);
+			jframe.setJMenuBar(bar);
+			worksheet = new WorkSheet();
+			worksheetview = new WorksheetView(worksheet);
+			worksheetview.addSelectionObserver(this);
 
-		jframe.setJMenuBar(bar);
-		worksheet = new WorkSheet();
-		worksheetview = new WorksheetView(worksheet);
-		worksheetview.addSelectionObserver(this);
+			// set up the tool area
+			JPanel toolarea = new JPanel();
+			toolarea.setBackground(new Color(24,24,24));
 
-		// set up the tool area
-		JPanel toolarea = new JPanel();
-		calculateButton = new JButton("Calculate");
-		calculateButton.addActionListener(this);
-		calculateButton.setActionCommand("CALCULATE");
-		toolarea.add(calculateButton);
-		selectedCellLabel = new JLabel("--");
-		selectedCellLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-		toolarea.add(selectedCellLabel);
-		cellEditTextField = new JTextField(20);
-		cellEditTextField.getDocument().addDocumentListener(this);
-		toolarea.add(cellEditTextField);
+			calculateButton = new ModernButton("Calculate", 120, 24, false);
 
-		functioneditor = new FunctionEditor(worksheet);
+			calculateButton.addActionListener(this);
+			calculateButton.setActionCommand("CALCULATE");
+			selectedCellLabel = new OJLabel("--", 12);
+			selectedCellLabel.setForeground(new Color(240,240,240));
+			toolarea.add(selectedCellLabel);
+			cellEditTextField = new ModernJTextField(200,24, 1000);
+			cellEditTextField.getDocument().addDocumentListener(this);
+			toolarea.add(cellEditTextField);
+			toolarea.add(calculateButton);
 
-		jframe.getContentPane().add(new JScrollPane(worksheetview),
-				BorderLayout.CENTER);
-		jframe.getContentPane().add(toolarea, BorderLayout.PAGE_START);
+			functioneditor = new FunctionEditor(worksheet);
 
-		jframe.setVisible(true);
-		jframe.setPreferredSize(PREFEREDDIM);
-		jframe.pack();
+			jframe.getContentPane().add(new ModernScrollPane(worksheetview, new Color(24,24,100), new Color(50,50,150)),
+					BorderLayout.CENTER);
+			jframe.getContentPane().add(toolarea, BorderLayout.PAGE_START);
+
+			jframe.setVisible(true);
+			jframe.setPreferredSize(PREFEREDDIM);
+			jframe.pack();
+		} catch (FontFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void makeMenuItem(JMenu menu, String name, String command) {
