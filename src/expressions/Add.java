@@ -1,12 +1,21 @@
 package expressions;
 
-public class Add extends Expression implements BinaryOp{
+public class Add extends Expression implements AdditiveBinaryOp{
 	Expression ex1;
 	Expression ex2;
+	public static String SYMBOL = "+";
+	
+	public Add(){}
+	
+	public Add(Expression ex1, Expression ex2){
+		this.ex1 = ex1;
+		this.ex2 = ex2;
+	}
+	
 	@Override
 	public String show() {
 		// TODO Auto-generated method stub
-		return ex1.show()+"+"+ex2.show();
+		return ex1.show()+SYMBOL+ex2.show();
 	}
 
 	@Override
@@ -18,7 +27,7 @@ public class Add extends Expression implements BinaryOp{
 	@Override
 	public String getToken() {
 		// TODO Auto-generated method stub
-		return "+";
+		return SYMBOL;
 	}
 
 }

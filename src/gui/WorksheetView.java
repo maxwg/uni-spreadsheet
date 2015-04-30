@@ -147,7 +147,7 @@ public class WorksheetView extends JTable implements TableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return worksheet.lookup(new CellIndex(columnIndex - 1, rowIndex));
+		return worksheet.lookup(new CellIndex(columnIndex - 1, rowIndex, worksheet));
 	}
 
 	@Override
@@ -197,7 +197,7 @@ public class WorksheetView extends JTable implements TableModel {
 
 	public CellIndex getSelectedIndex() {
 		return new CellIndex(this.getSelectedColumn() - 1,
-				this.getSelectedRow());
+				this.getSelectedRow(), worksheet);
 	}
 
 	public void setWorksheet(WorkSheet worksheet) {

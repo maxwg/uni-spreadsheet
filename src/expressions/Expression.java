@@ -3,6 +3,7 @@ package expressions;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 /**
  * @author max
@@ -11,25 +12,55 @@ import java.io.StringReader;
  *          associate unambiguous grammar which should possess traditional
  *          mathematical precedence rules. The grammar is as follows:
  * 
- *          aexp ::= aexp + mexp | aexp - mexp | mexp
- *          mexp ::= mexp * pexp | mexp / pexp | pext
- *          pexp ::= pexp ^ fexp | fexp
- *          fexp ::= func(aexp[]) | vexp
- *          vexp ::= (aexp) | number
  */
+// aexp ::= aexp <AdditiveBinaryOp> mexp | mexp
+// mexp ::= mexp <MultiplicativeBinaryOp> pexp | pexp
+// pexp ::= pexp <ExponentialBinaryOp> fexp | fexp
+// fexp ::= <UnaryOp>(aexp[]) | vexp
+// vexp ::= (aexp) | <Number> | <CellRef>
 public abstract class Expression {
 	public abstract String show();
+
 	public abstract double evaluate();
-	private static Class[] aexp = new Class[]{Add.class, Sub.class};
-	public static Expression parse(){
+
+	private static Class[] aexp = new Class[] { Add.class, Sub.class };
+	//USE STARTENDINDEX IN PLACE
+	public static Expression parse(Object[] tokens) throws IOException {
+		if (tokens.length == 1 && tokens[0] instanceof Double)
+			return new Number((double) tokens[0]);
+		for (int i = 0; i < tokens.length; i++) {
+			return null;
+		}
 		return null;
 	}
-	public static double calculate(String expr) throws IOException{
+
+	public static Double calculate(String expr) throws IOException {
 		StreamTokenizer tok = new StreamTokenizer(new StringReader(expr));
-		while(tok.nextToken() != StreamTokenizer.TT_EOF){
-			System.out.println(tok.toString());
+		tok.ordinaryChar('/');
+		ArrayList<Object> tokens = new ArrayList<Object>();
+		int tVal;
+		while ((tVal = tok.nextToken()) != StreamTokenizer.TT_EOF) {
+			switch (tVal) {
+			case StreamTokenizer.TT_NUMBER:
+				if (tok.nval < 0
+						&& tokens.get(tokens.size() - 1) instanceof Double) {
+					tokens.add("-");
+					tokens.add(-tok.nval);
+				} else
+					tokens.add(tok.nval);
+				break;
+			case StreamTokenizer.TT_WORD:
+				tokens.add(tok.sval);
+				break;
+			default:
+				tokens.add(Character.toString((char) tVal));
+				break;
+			}
 		}
-		return 43;
+		for (Object tk : tokens)
+			System.out.println(tk);
+		Expression expression = parse(tokens.toArray());
+		return expression == null ? null : expression.evaluate();
 	}
-	
+
 }

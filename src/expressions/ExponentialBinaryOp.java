@@ -1,5 +1,5 @@
 package expressions;
 
-public interface BinaryOp {
+public interface ExponentialBinaryOp {
 	public String getToken();
 }

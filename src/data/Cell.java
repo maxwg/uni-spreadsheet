@@ -1,15 +1,16 @@
 package data;
 
+import java.io.IOException;
+
 import expressions.Expression;
 
-
 /**
- * Cell - an object of this class holds the data of a single cell. 
+ * Cell - an object of this class holds the data of a single cell.
  * 
  * @author Eric McCreath
  */
 
-public class Cell {
+public class Cell{
 
 	private String text; // this is the text the person typed into the cell
 	private Double calculatedValue; // this is the current calculated value for
@@ -30,16 +31,18 @@ public class Cell {
 	}
 
 	public void calcuate(WorkSheet worksheet) {
-		try {
-			calculatedValue = Double.parseDouble(text);
-		} catch (NumberFormatException nfe) {
-			try{
-				calculatedValue = Expression.calculate(text);
+		if (!text.equals(""))
+			try {
+				calculatedValue = Double.parseDouble(text);
+			} catch (NumberFormatException nfe) {
+				try {
+					calculatedValue = Expression.calculate(text);
+				} catch (IOException e) {
+					calculatedValue = null;
+				}
 			}
-			catch (Exception e){
-				e.printStackTrace();
-			}
-		}
+		else
+			calculatedValue = null;
 	}
 
 	public String show() { // this is what is viewed in each Cell

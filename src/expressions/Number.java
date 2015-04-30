@@ -2,6 +2,11 @@ package expressions;
 
 public class Number extends Expression implements Value {
 	double val;
+	
+	public Number(double val){
+		this.val=val;
+	}
+	
 	@Override
 	public String show() {
 		// TODO Auto-generated method stub
