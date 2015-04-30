@@ -1,4 +1,8 @@
 package data;
+
+import expressions.Expression;
+
+
 /**
  * Cell - an object of this class holds the data of a single cell. 
  * 
@@ -29,7 +33,12 @@ public class Cell {
 		try {
 			calculatedValue = Double.parseDouble(text);
 		} catch (NumberFormatException nfe) {
-			calculatedValue = null;
+			try{
+				calculatedValue = Expression.calculate(text);
+			}
+			catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

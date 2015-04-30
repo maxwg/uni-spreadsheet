@@ -2,6 +2,9 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -33,12 +36,14 @@ public class WorksheetView extends JTable implements TableModel {
 	private static final long serialVersionUID = 1L;
 
 	WorkSheet worksheet;
+	Spreadsheet spreadsheet;
 
 	ArrayList<TableModelListener> listeners;
 	ArrayList<SelectionObserver> observers;
 
-	public WorksheetView(WorkSheet worksheet) {
+	public WorksheetView(WorkSheet worksheet, Spreadsheet ss) {
 		this.worksheet = worksheet;
+		this.spreadsheet = ss;
 		listeners = new ArrayList<TableModelListener>();
 		observers = new ArrayList<SelectionObserver>();
 		this.setModel(this);
@@ -67,6 +72,26 @@ public class WorksheetView extends JTable implements TableModel {
 			getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
 		}
 		setBackground(new Color(250, 250, 250));
+		addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				spreadsheet.cellEditTextField.requestFocus();
+					spreadsheet.cellEditTextField.setText(e.getKeyChar() == KeyEvent.VK_BACK_SPACE ? "" : e.getKeyChar()+"");
+			}
+		});
 	}
 
 	// getCellRenderer - provides the renderers for the cells. Note the first
@@ -101,7 +126,7 @@ public class WorksheetView extends JTable implements TableModel {
 						|| (table.getSelectedColumn() == column && table
 								.getSelectedRow() == row)) {
 					lab.setOpaque(true);
-					lab.setBackground(new Color(220, 220, 220));
+					lab.setBackground(new Color(220, 220, 250));
 				}
 				return lab;
 

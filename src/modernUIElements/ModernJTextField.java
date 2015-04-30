@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 
 public class ModernJTextField extends JTextField {
 	private static final long serialVersionUID = 4159783237856056109L;
-	public static final char[] illegalCharacters = { '\1', '<', '>', '\n', '\r' };
+	public static final char[] illegalCharacters = { '\n', '\r' };
 
 	public ModernJTextField(int width, int height, final int charLim)
 			throws FontFormatException, IOException {
@@ -53,7 +53,7 @@ public class ModernJTextField extends JTextField {
 			}
 		});
 	}
-	
+
 	private void preventIllegalCharacters() {
 		this.addKeyListener(new KeyListener() {
 			@Override

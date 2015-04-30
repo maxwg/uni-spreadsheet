@@ -7,6 +7,7 @@ import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -42,7 +43,7 @@ public class Spreadsheet implements Runnable, ActionListener,
 	private static final String SAVECOMMAND = "savecommand";
 	private static final String OPENCOMMAND = "opencommand";
 	private static final String EDITFUNCTIONCOMMAND = "editfunctioncommand";
-
+	
 	JFrame jframe;
 	public WorksheetView worksheetview;
 	public FunctionEditor functioneditor;
@@ -79,17 +80,23 @@ public class Spreadsheet implements Runnable, ActionListener,
 
 			jframe.setJMenuBar(bar);
 			worksheet = new WorkSheet();
-			worksheetview = new WorksheetView(worksheet);
+			worksheetview = new WorksheetView(worksheet, this);
 			worksheetview.addSelectionObserver(this);
 
 			// set up the tool area
 			JPanel toolarea = new JPanel();
 			toolarea.setBackground(new Color(24,24,24));
 
-			calculateButton = new ModernButton("Calculate", 120, 24, false);
-
-			calculateButton.addActionListener(this);
-			calculateButton.setActionCommand("CALCULATE");
+			calculateButton = new ModernButton("Calculate", 120, 24, new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					worksheet.calculate();
+					return null;
+				}
+			},false);
+			//calculateButton.addActionListener(this);
+			//calculateButton.setActionCommand("CALCULATE");
+			
 			selectedCellLabel = new OJLabel("--", 12);
 			selectedCellLabel.setForeground(new Color(240,240,240));
 			toolarea.add(selectedCellLabel);
