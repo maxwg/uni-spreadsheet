@@ -1,6 +1,6 @@
 package expressions;
 
-public class Pow extends Expression implements AdditiveBinaryOp{
+public class Pow extends Expression implements BinaryOp{
 	Expression ex1;
 	Expression ex2;
 	public static String SYMBOL = "^";

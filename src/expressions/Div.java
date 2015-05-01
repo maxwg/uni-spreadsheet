@@ -1,6 +1,6 @@
 package expressions;
 
-public class Div extends Expression implements AdditiveBinaryOp{
+public class Div extends Expression implements BinaryOp{
 	Expression ex1;
 	Expression ex2;
 	public static String SYMBOL = "/";

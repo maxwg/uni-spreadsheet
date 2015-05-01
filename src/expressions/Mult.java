@@ -1,6 +1,6 @@
 package expressions;
 
-public class Mult extends Expression implements AdditiveBinaryOp{
+public class Mult extends Expression implements BinaryOp{
 	Expression ex1;
 	Expression ex2;
 	public static String SYMBOL = "*";

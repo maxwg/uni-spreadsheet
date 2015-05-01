@@ -1,27 +1,25 @@
 package expressions;
 
-public class Add extends Expression implements BinaryOp{
+public class Sin extends Expression implements UnaryOp{
 	Expression ex1;
-	Expression ex2;
-	public static String SYMBOL = "+";
+	public static String SYMBOL = "SIN";
 	
-	public Add(){}
+	public Sin(){}
 	
-	public Add(Expression ex1, Expression ex2){
+	public Sin(Expression ex1){
 		this.ex1 = ex1;
-		this.ex2 = ex2;
 	}
 	
 	@Override
 	public String show() {
 		// TODO Auto-generated method stub
-		return ex1.show()+SYMBOL+ex2.show();
+		return "sin("+ex1.show()+")";
 	}
 
 	@Override
 	public double evaluate() {
 		// TODO Auto-generated method stub
-		return ex1.evaluate() + ex2.evaluate();
+		return Math.sin(ex1.evaluate());
 	}
 
 	@Override

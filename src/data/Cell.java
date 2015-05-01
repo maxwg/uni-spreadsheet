@@ -10,7 +10,7 @@ import expressions.Expression;
  * @author Eric McCreath
  */
 
-public class Cell{
+public class Cell {
 
 	private String text; // this is the text the person typed into the cell
 	private Double calculatedValue; // this is the current calculated value for
@@ -37,8 +37,8 @@ public class Cell{
 			} catch (NumberFormatException nfe) {
 				try {
 					calculatedValue = Expression.calculate(text);
-				} catch (IOException e) {
-					calculatedValue = null;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		else

@@ -79,6 +79,7 @@ public class Spreadsheet implements Runnable, ActionListener,
 			makeMenuItem(menu, "EditFunction", EDITFUNCTIONCOMMAND);
 
 			jframe.setJMenuBar(bar);
+			
 			worksheet = new WorkSheet();
 			worksheetview = new WorksheetView(worksheet, this);
 			worksheetview.addSelectionObserver(this);
@@ -99,6 +100,7 @@ public class Spreadsheet implements Runnable, ActionListener,
 			
 			selectedCellLabel = new OJLabel("--", 12);
 			selectedCellLabel.setForeground(new Color(240,240,240));
+			selectedCellLabel.setPreferredSize(new Dimension(24, selectedCellLabel.getPreferredSize().height));
 			toolarea.add(selectedCellLabel);
 			cellEditTextField = new ModernJTextField(200,24, 1000);
 			cellEditTextField.getDocument().addDocumentListener(this);
