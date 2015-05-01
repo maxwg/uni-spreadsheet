@@ -31,22 +31,22 @@ public class Cell {
 	}
 
 	public void calcuate(WorkSheet worksheet) {
-		if (!text.equals(""))
+		if (!text.equals("")) {
 			try {
-				calculatedValue = Double.parseDouble(text);
-			} catch (NumberFormatException nfe) {
-				try {
-					calculatedValue = Expression.calculate(text);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				calculatedValue = Expression.calculate(text, worksheet);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		else
+		} else
 			calculatedValue = null;
 	}
 
 	public String show() { // this is what is viewed in each Cell
 		return calculatedValue == null ? text : calculatedValue.toString();
+	}
+	
+	public String text(){
+		return text;
 	}
 
 	@Override

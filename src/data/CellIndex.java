@@ -26,7 +26,8 @@ public class CellIndex extends Expression {
 		this.worksheet = worksheet;
 	}
 
-	public CellIndex(String index) {
+	public CellIndex(String index, WorkSheet worksheet) {
+		this.worksheet = worksheet;
 		char letter = index.charAt(0);
 		column = letter - 'A';
 		row = Integer.parseInt(index.substring(1)) - 1;
@@ -49,6 +50,8 @@ public class CellIndex extends Expression {
 
 	@Override
 	public double evaluate() {
-		return worksheet.lookup(this).value();
+		Cell c = worksheet.lookup(this);
+		c.calcuate(worksheet);
+		return c.value() == null ? 0 : c.value();
 	}
 }

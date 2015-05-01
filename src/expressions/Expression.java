@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import data.CellIndex;
+import data.WorkSheet;
 import dataStructures.ListStream;
 
 /**
@@ -25,7 +27,6 @@ import dataStructures.ListStream;
 @SuppressWarnings("unchecked")
 public abstract class Expression {
 	public abstract String show();
-
 	public abstract double evaluate();
 
 	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
@@ -48,7 +49,9 @@ public abstract class Expression {
 		}
 	}
 	private static Class<UnaryOp>[] uexp = new Class[] { Sin.class };
-
+	private static WorkSheet worksheet;
+	
+	
 	private static Expression parseBinaryExp(ListStream tokens,
 			Class<BinaryOp>[] lexp, Method nextParse,
 			Method additionalProcessing) throws Exception {
@@ -141,14 +144,25 @@ public abstract class Expression {
 			tokens.next();
 			return exp;
 		}
-		if (!(tokens.current() instanceof Double))
-			throw new ParseException();
-		Expression exp = new Number((double) tokens.current());
+		Expression exp = null;
+		try{
+			exp = new Number((double) tokens.current());
+		}
+		catch(ClassCastException e)
+		{
+			try{
+				exp = new CellIndex(((String)tokens.current()).toUpperCase(), worksheet);
+			}
+			catch(ClassCastException | NumberFormatException | IndexOutOfBoundsException ex){
+				throw new ParseException();
+			}
+		}
 		tokens.next();
 		return exp;
 	}
 
-	public static Double calculate(String expr) throws Exception {
+	public static Double calculate(String expr, WorkSheet ws) throws Exception {
+		worksheet = ws;
 		StreamTokenizer tok = new StreamTokenizer(new StringReader(expr));
 		tok.ordinaryChar('/');
 		ArrayList<Object> tokens = new ArrayList<Object>();
@@ -171,8 +185,6 @@ public abstract class Expression {
 				break;
 			}
 		}
-		for (Object t : tokens)
-			System.out.println(t);
 		try {
 			return parseAEXP(new ListStream(tokens)).evaluate();
 		} catch (InstantiationException | IllegalAccessException

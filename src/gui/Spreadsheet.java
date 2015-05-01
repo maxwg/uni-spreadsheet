@@ -7,17 +7,14 @@ import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,17 +30,12 @@ import data.WorkSheet;
 public class Spreadsheet implements Runnable, ActionListener,
 		SelectionObserver, DocumentListener {
 
-	private static final Dimension PREFEREDDIM = new Dimension(500, 400);
+	private static final Dimension PREFEREDDIM = new Dimension(630, 400);
 	/**
 	 * Spreadsheet - a simple spreadsheet program. Eric McCreath 2015
 	 */
+	private static final String CALCULATECOMMAND = "calculatecommand";
 
-	private static final String EXITCOMMAND = "exitcommand";
-	private static final String CLEARCOMMAND = "clearcommand";
-	private static final String SAVECOMMAND = "savecommand";
-	private static final String OPENCOMMAND = "opencommand";
-	private static final String EDITFUNCTIONCOMMAND = "editfunctioncommand";
-	
 	JFrame jframe;
 	public WorksheetView worksheetview;
 	public FunctionEditor functioneditor;
@@ -51,7 +43,6 @@ public class Spreadsheet implements Runnable, ActionListener,
 	public JButton calculateButton;
 	public JTextField cellEditTextField;
 	JLabel selectedCellLabel;
-	JFileChooser filechooser = new JFileChooser();
 
 	public Spreadsheet() {
 		SwingUtilities.invokeLater(this);
@@ -65,52 +56,51 @@ public class Spreadsheet implements Runnable, ActionListener,
 		try {
 			jframe = new JFrame("Spreadsheet");
 			jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			jframe.setBackground(new Color(24,24,24));
+			jframe.setBackground(new Color(24, 24, 24));
 			// set up the menu bar
-			JMenuBar bar = new JMenuBar();
-			JMenu menu = new JMenu("File");
-			bar.add(menu);
-			makeMenuItem(menu, "New", CLEARCOMMAND);
-			makeMenuItem(menu, "Open", OPENCOMMAND);
-			makeMenuItem(menu, "Save", SAVECOMMAND);
-			makeMenuItem(menu, "Exit", EXITCOMMAND);
-			menu = new JMenu("Edit");
-			bar.add(menu);
-			makeMenuItem(menu, "EditFunction", EDITFUNCTIONCOMMAND);
+			/*
+			 * JMenuBar bar = new JMenuBar(); JMenu menu = new JMenu("File");
+			 * bar.add(menu); makeMenuItem(menu, "New", CLEARCOMMAND);
+			 * makeMenuItem(menu, "Open", OPENCOMMAND); makeMenuItem(menu,
+			 * "Save", SAVECOMMAND); makeMenuItem(menu, "Exit", EXITCOMMAND);
+			 * menu = new JMenu("Edit"); bar.add(menu); makeMenuItem(menu,
+			 * "EditFunction", EDITFUNCTIONCOMMAND);
+			 * 
+			 * jframe.setJMenuBar(bar);
+			 */
+			jframe.setUndecorated(true);
 
-			jframe.setJMenuBar(bar);
-			
 			worksheet = new WorkSheet();
 			worksheetview = new WorksheetView(worksheet, this);
 			worksheetview.addSelectionObserver(this);
 
 			// set up the tool area
-			JPanel toolarea = new JPanel();
-			toolarea.setBackground(new Color(24,24,24));
+			JPanel toolarea = new JPanel(new BorderLayout());
+			toolarea.setBackground(new Color(24, 24, 24));
+			toolarea.add(new TopMenu(jframe, this), BorderLayout.PAGE_START);
 
-			calculateButton = new ModernButton("Calculate", 120, 24, new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					worksheet.calculate();
-					return null;
-				}
-			},false);
-			//calculateButton.addActionListener(this);
-			//calculateButton.setActionCommand("CALCULATE");
-			
+			calculateButton = new ModernButton("Calculate", 120, 24, null);
+			calculateButton.addActionListener(this);
+			calculateButton.setActionCommand(CALCULATECOMMAND);
+
 			selectedCellLabel = new OJLabel("--", 12);
-			selectedCellLabel.setForeground(new Color(240,240,240));
-			selectedCellLabel.setPreferredSize(new Dimension(24, selectedCellLabel.getPreferredSize().height));
-			toolarea.add(selectedCellLabel);
-			cellEditTextField = new ModernJTextField(200,24, 1000);
+			selectedCellLabel.setForeground(new Color(240, 240, 240));
+			selectedCellLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			selectedCellLabel.setBorder(BorderFactory.createEmptyBorder(0, 0,
+					0, 2));
+			selectedCellLabel.setPreferredSize(new Dimension(32,
+					selectedCellLabel.getPreferredSize().height));
+			toolarea.add(selectedCellLabel, BorderLayout.LINE_START);
+			cellEditTextField = new ModernJTextField(200, 28, 1000);
 			cellEditTextField.getDocument().addDocumentListener(this);
-			toolarea.add(cellEditTextField);
-			toolarea.add(calculateButton);
+			toolarea.add(cellEditTextField, BorderLayout.CENTER);
+			toolarea.add(calculateButton, BorderLayout.LINE_END);
 
 			functioneditor = new FunctionEditor(worksheet);
 
-			jframe.getContentPane().add(new ModernScrollPane(worksheetview, new Color(24,24,100), new Color(50,50,150)),
-					BorderLayout.CENTER);
+			jframe.getContentPane().add(
+					new ModernScrollPane(worksheetview, new Color(24, 24, 100),
+							new Color(50, 50, 150)), BorderLayout.CENTER);
 			jframe.getContentPane().add(toolarea, BorderLayout.PAGE_START);
 
 			jframe.setVisible(true);
@@ -122,38 +112,15 @@ public class Spreadsheet implements Runnable, ActionListener,
 		}
 	}
 
-	private void makeMenuItem(JMenu menu, String name, String command) {
-		JMenuItem menuitem = new JMenuItem(name);
-		menu.add(menuitem);
-		menuitem.addActionListener(this);
-		menuitem.setActionCommand(command);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals(EXITCOMMAND)) {
-			exit();
-		} else if (ae.getActionCommand().equals(SAVECOMMAND)) {
-			int res = filechooser.showOpenDialog(jframe);
-			if (res == JFileChooser.APPROVE_OPTION) {
-				worksheet.save(filechooser.getSelectedFile());
-			}
-		} else if (ae.getActionCommand().equals(OPENCOMMAND)) {
-			int res = filechooser.showOpenDialog(jframe);
-			if (res == JFileChooser.APPROVE_OPTION) {
-				worksheet = WorkSheet.load(filechooser.getSelectedFile());
-				worksheetChange();
-			}
-		} else if (ae.getActionCommand().equals(CLEARCOMMAND)) {
-			worksheet = new WorkSheet();
-			worksheetChange();
-		} else if (ae.getActionCommand().equals(EDITFUNCTIONCOMMAND)) {
-			functioneditor.setVisible(true);
-
+		if (ae.getActionCommand().equals(CALCULATECOMMAND)) {
+			worksheetview.valueChanged(null);
+			worksheet.calculate();
 		}
 	}
 
-	private void worksheetChange() {
+	void worksheetChange() {
 		worksheetview.setWorksheet(worksheet);
 		functioneditor.setWorksheet(worksheet);
 		worksheetview.repaint();
@@ -167,7 +134,7 @@ public class Spreadsheet implements Runnable, ActionListener,
 	public void update() {
 		CellIndex index = worksheetview.getSelectedIndex();
 		selectedCellLabel.setText(index.show());
-		cellEditTextField.setText(worksheet.lookup(index).show());
+		cellEditTextField.setText(worksheet.lookup(index).text());
 		jframe.repaint();
 	}
 

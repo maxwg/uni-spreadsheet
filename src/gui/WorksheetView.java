@@ -73,23 +73,30 @@ public class WorksheetView extends JTable implements TableModel {
 		}
 		setBackground(new Color(250, 250, 250));
 		addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				spreadsheet.cellEditTextField.requestFocus();
-					spreadsheet.cellEditTextField.setText(e.getKeyChar() == KeyEvent.VK_BACK_SPACE ? "" : e.getKeyChar()+"");
+				spreadsheet.cellEditTextField
+						.setText(e.getKeyChar() <= KeyEvent.VK_9
+								&& e.getKeyChar() >= KeyEvent.VK_0
+								|| e.getKeyChar() >= KeyEvent.VK_A
+								&& e.getKeyChar() <= KeyEvent.VK_Z ? e
+								.getKeyChar() + "" : ""); // Only set text if
+															// alphanumeric key,
+															// else focus
 			}
 		});
 	}
@@ -147,7 +154,8 @@ public class WorksheetView extends JTable implements TableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return worksheet.lookup(new CellIndex(columnIndex - 1, rowIndex, worksheet));
+		return worksheet.lookup(new CellIndex(columnIndex - 1, rowIndex,
+				worksheet));
 	}
 
 	@Override

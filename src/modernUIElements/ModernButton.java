@@ -61,6 +61,7 @@ public class ModernButton extends JButton {
 		super(text);
 		this.func = func;
 		this.setSize(w, h);
+		this.setPreferredSize(new Dimension(w, h));
 		if (useLightFont)
 			initialize(LIGHT);
 		else
@@ -77,6 +78,7 @@ public class ModernButton extends JButton {
 		super(icon);
 		this.func = func;
 		this.setSize(w, h);
+		this.setPreferredSize(new Dimension(w, h));
 		initialize(REGULAR);
 	}
 

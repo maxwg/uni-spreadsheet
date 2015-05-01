@@ -91,6 +91,6 @@ public class WorkSheet {
 	}
 
 	private void put(String index, String text) {
-		tabledata.put(new CellIndex(index), new Cell(text));
+		tabledata.put(new CellIndex(index, this), new Cell(text));
 	}
 }
