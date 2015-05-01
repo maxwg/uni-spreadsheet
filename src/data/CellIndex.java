@@ -47,10 +47,12 @@ public class CellIndex extends Expression {
 	public String show() {
 		return ((char) ('A' + (char) column)) + "" + (row + 1);
 	}
-
+	public Cell getCell(){
+		return worksheet.lookup(this);
+	}
 	@Override
 	public double evaluate() {
-		Cell c = worksheet.lookup(this);
+		Cell c = getCell();
 		c.calcuate(worksheet);
 		return c.value() == null ? 0 : c.value();
 	}

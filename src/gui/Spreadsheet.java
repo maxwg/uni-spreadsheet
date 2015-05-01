@@ -6,6 +6,10 @@ import java.awt.Dimension;
 import java.awt.FontFormatException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -57,17 +61,6 @@ public class Spreadsheet implements Runnable, ActionListener,
 			jframe = new JFrame("Spreadsheet");
 			jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			jframe.setBackground(new Color(24, 24, 24));
-			// set up the menu bar
-			/*
-			 * JMenuBar bar = new JMenuBar(); JMenu menu = new JMenu("File");
-			 * bar.add(menu); makeMenuItem(menu, "New", CLEARCOMMAND);
-			 * makeMenuItem(menu, "Open", OPENCOMMAND); makeMenuItem(menu,
-			 * "Save", SAVECOMMAND); makeMenuItem(menu, "Exit", EXITCOMMAND);
-			 * menu = new JMenu("Edit"); bar.add(menu); makeMenuItem(menu,
-			 * "EditFunction", EDITFUNCTIONCOMMAND);
-			 * 
-			 * jframe.setJMenuBar(bar);
-			 */
 			jframe.setUndecorated(true);
 
 			worksheet = new WorkSheet();
@@ -93,6 +86,37 @@ public class Spreadsheet implements Runnable, ActionListener,
 			toolarea.add(selectedCellLabel, BorderLayout.LINE_START);
 			cellEditTextField = new ModernJTextField(200, 28, 1000);
 			cellEditTextField.getDocument().addDocumentListener(this);
+			cellEditTextField.addKeyListener(new KeyListener() {
+				@Override
+				public void keyTyped(KeyEvent e) {
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+				}
+
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_DOWN
+							|| e.getKeyCode() == KeyEvent.VK_UP
+							|| e.getKeyCode() == KeyEvent.VK_ENTER) {
+						worksheetview.requestFocus();
+					}
+				}
+			});
+			cellEditTextField.addFocusListener(new FocusListener() {
+				
+				@Override
+				public void focusLost(FocusEvent e) {
+					worksheetview.getPreviousIndex().getCell().calcuate(worksheet);
+				}
+				
+				@Override
+				public void focusGained(FocusEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			toolarea.add(cellEditTextField, BorderLayout.CENTER);
 			toolarea.add(calculateButton, BorderLayout.LINE_END);
 

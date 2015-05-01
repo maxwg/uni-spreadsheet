@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -37,9 +36,9 @@ public class WorksheetView extends JTable implements TableModel {
 
 	WorkSheet worksheet;
 	Spreadsheet spreadsheet;
-
-	ArrayList<TableModelListener> listeners;
-	ArrayList<SelectionObserver> observers;
+	private CellIndex pCell = new CellIndex("A1", worksheet);
+	private ArrayList<TableModelListener> listeners;
+	private ArrayList<SelectionObserver> observers;
 
 	public WorksheetView(WorkSheet worksheet, Spreadsheet ss) {
 		this.worksheet = worksheet;
@@ -88,15 +87,22 @@ public class WorksheetView extends JTable implements TableModel {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				spreadsheet.cellEditTextField.requestFocus();
-				spreadsheet.cellEditTextField
-						.setText(e.getKeyChar() <= KeyEvent.VK_9
-								&& e.getKeyChar() >= KeyEvent.VK_0
-								|| e.getKeyChar() >= KeyEvent.VK_A
-								&& e.getKeyChar() <= KeyEvent.VK_Z ? e
-								.getKeyChar() + "" : ""); // Only set text if
-															// alphanumeric key,
-															// else focus
+				if (!(e.getKeyChar() == KeyEvent.VK_LEFT
+						|| e.getKeyChar() == KeyEvent.VK_RIGHT
+						|| e.getKeyChar() == KeyEvent.VK_DOWN
+						|| e.getKeyChar() == KeyEvent.VK_UP
+						|| e.getKeyChar() == KeyEvent.VK_TAB
+						|| e.getKeyChar() == KeyEvent.CHAR_UNDEFINED || e
+							.getKeyChar() == KeyEvent.VK_ENTER)) {
+					spreadsheet.cellEditTextField.requestFocus();
+					spreadsheet.cellEditTextField
+							.setText(Character.isLetterOrDigit(e.getKeyChar())? e
+									.getKeyChar() + "" : ""); // Only set text
+																// if
+																// alphanumeric
+																// key,
+																// else focus
+				}
 			}
 		});
 	}
@@ -134,9 +140,9 @@ public class WorksheetView extends JTable implements TableModel {
 								.getSelectedRow() == row)) {
 					lab.setOpaque(true);
 					lab.setBackground(new Color(220, 220, 250));
+					pCell = new CellIndex(column-1, row, worksheet);
 				}
 				return lab;
-
 			}
 
 		};
@@ -207,7 +213,11 @@ public class WorksheetView extends JTable implements TableModel {
 		return new CellIndex(this.getSelectedColumn() - 1,
 				this.getSelectedRow(), worksheet);
 	}
-
+	
+	public CellIndex getPreviousIndex(){
+		return pCell;
+	}
+	
 	public void setWorksheet(WorkSheet worksheet) {
 		this.worksheet = worksheet;
 		this.repaint();
