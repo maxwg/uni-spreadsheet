@@ -48,12 +48,18 @@ public class CellIndex extends Expression {
 		return ((char) ('A' + (char) column)) + "" + (row + 1);
 	}
 	public Cell getCell(){
-		return worksheet.lookup(this);
+		return worksheet == null? new Cell() : worksheet.lookup(this);
 	}
 	@Override
 	public double evaluate() {
 		Cell c = getCell();
 		c.calcuate(worksheet);
 		return c.value() == null ? 0 : c.value();
+	}
+
+	@Override
+	public String toLatex() {
+		// TODO Auto-generated method stub
+		return show();
 	}
 }

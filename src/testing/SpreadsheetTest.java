@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import gui.Spreadsheet;
 
+import java.awt.event.FocusEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
@@ -44,7 +45,7 @@ public class SpreadsheetTest {
 				public void run() {
 					selectAndSet(1, 3, "Some Text");
 					selectAndSet(4, 1, "5.12");
-					gui.calculateButton.doClick();
+
 				}
 			});
 			assertEquals(
@@ -72,31 +73,23 @@ public class SpreadsheetTest {
 					selectAndSet(3, 3, "23.4");
 					selectAndSet(4, 3, "34.1");
 					selectAndSet(5, 3, "2.6+C4*C5");
-					gui.calculateButton.doClick();
+
 				}
 			});
 
-			SwingUtilities.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					assertEquals(
-							gui.worksheet.lookup(
-									new CellIndex("C3", gui.worksheet)).show(),
-							"Some Text");
-					assertEquals(
-							gui.worksheet.lookup(
-									new CellIndex("C4", gui.worksheet)).show(),
-							"23.4");
-					assertEquals(
-							gui.worksheet.lookup(
-									new CellIndex("C5", gui.worksheet)).show(),
-							"34.1");
-					assertEquals(
-							gui.worksheet.lookup(
-									new CellIndex("C6", gui.worksheet)).show(),
-							"800.54");
-				}
-			});
+			assertEquals(
+					gui.worksheet.lookup(new CellIndex("C3", gui.worksheet))
+							.show(), "Some Text");
+			assertEquals(
+					gui.worksheet.lookup(new CellIndex("C4", gui.worksheet))
+							.show(), "23.4");
+			assertEquals(
+					gui.worksheet.lookup(new CellIndex("C5", gui.worksheet))
+							.show(), "34.1");
+			assertEquals(
+					gui.worksheet.lookup(new CellIndex("C6", gui.worksheet))
+							.show(), "800.54");
+
 		} catch (InvocationTargetException e) {
 			fail();
 		} catch (InterruptedException e) {
@@ -120,7 +113,7 @@ public class SpreadsheetTest {
 					selectAndSet(6, 3, "MAX(C3:C5)");
 					gui.functioneditor.textarea.setText(sumandmaxfunctions);
 					gui.functioneditor.updateWorksheet();
-					gui.calculateButton.doClick();
+
 				}
 			});
 			assertEquals(
@@ -149,5 +142,6 @@ public class SpreadsheetTest {
 		gui.worksheetview.addRowSelectionInterval(r, r);
 		gui.worksheetview.addColumnSelectionInterval(c, c);
 		gui.cellEditTextField.setText(text);
+		gui.worksheetview.getSelectedIndex().getCell().calcuate(gui.worksheet);
 	}
 }

@@ -1,5 +1,5 @@
 package expressions;
 
-public interface UnaryOp {
+public interface Const {
 	public String getToken();
 }

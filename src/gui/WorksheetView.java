@@ -70,7 +70,7 @@ public class WorksheetView extends JTable implements TableModel {
 		for (int i = 0; i < getModel().getColumnCount(); i++) {
 			getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
 		}
-		setBackground(new Color(250, 250, 250));
+		setBackground(new Color(251, 251, 255));
 		addKeyListener(new KeyListener() {
 
 			@Override

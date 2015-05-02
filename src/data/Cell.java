@@ -15,6 +15,7 @@ public class Cell {
 	private String text; // this is the text the person typed into the cell
 	private Double calculatedValue; // this is the current calculated value for
 									// the cell
+	private Expression calculatedExpression;
 
 	public Cell(String text) {
 		this.text = text;
@@ -33,8 +34,11 @@ public class Cell {
 	public void calcuate(WorkSheet worksheet) {
 		if (!text.equals("")) {
 			try {
-				calculatedValue = Expression.calculate(text, worksheet);
+				calculatedExpression = Expression.calculate(text, worksheet);
+				calculatedValue = calculatedExpression == null ? null
+						: calculatedExpression.evaluate();
 			} catch (Exception e) {
+				calculatedValue = null;
 				e.printStackTrace();
 			}
 		} else
@@ -44,8 +48,14 @@ public class Cell {
 	public String show() { // this is what is viewed in each Cell
 		return calculatedValue == null ? text : calculatedValue.toString();
 	}
-	
-	public String text(){
+
+	public String getLatex(WorkSheet worksheet) {
+		calcuate(worksheet);
+		return calculatedExpression == null ? null : calculatedExpression
+				.toLatex();
+	}
+
+	public String text() {
 		return text;
 	}
 

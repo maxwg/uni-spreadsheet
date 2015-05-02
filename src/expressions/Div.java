@@ -30,4 +30,9 @@ public class Div extends Expression implements BinaryOp{
 		return SYMBOL;
 	}
 
+	@Override
+	public String toLatex() {
+		return "\\frac{"+ex1.toLatex()+"}{"+ex2.toLatex()+"}";
+	}
+
 }

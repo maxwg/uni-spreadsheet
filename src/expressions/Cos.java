@@ -1,24 +1,24 @@
 package expressions;
 
-public class Sin extends Expression implements FunctionOp {
+public class Cos extends Expression implements FunctionOp {
 	Expression ex1;
-	public static String SYMBOL = "SIN";
+	public static String SYMBOL = "COS";
 
-	public Sin() {
+	public Cos() {
 	}
 
-	public Sin(Expression ex1) {
+	public Cos(Expression ex1) {
 		this.ex1 = ex1;
 	}
 
 	@Override
 	public String show() {
-		return "sin(" + ex1.show() + ")";
+		return "cos(" + ex1.show() + ")";
 	}
 
 	@Override
 	public double evaluate() {
-		return Math.sin(ex1.evaluate());
+		return Math.cos(ex1.evaluate());
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class Sin extends Expression implements FunctionOp {
 
 	@Override
 	public String toLatex() {
-		return "\\sin\\left("+ex1.toLatex()+"\\right)";
+		return "\\cos\\left("+ex1.toLatex()+"\\right)";
 	}
 
 }

@@ -30,4 +30,9 @@ public class Add extends Expression implements BinaryOp{
 		return SYMBOL;
 	}
 
+	@Override
+	public String toLatex() {
+		return ex1.toLatex() +"+"+ex2.toLatex();
+	}
+
 }
