@@ -8,7 +8,7 @@ public class Log extends Expression implements FunctionOp {
 	public Log() {
 	}
 
-	public Log(Expression ex1, Expression base) {
+	public Log(Expression base, Expression ex1) {
 		this.ex1 = ex1;
 		this.base = base;
 	}
