@@ -1,5 +1,10 @@
 package expressions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import data.CellIndex;
+
 public class Ln extends Expression implements FunctionOp {
 	Expression ex1;
 	public static String SYMBOL = "LN";
@@ -35,6 +40,13 @@ public class Ln extends Expression implements FunctionOp {
 	public String toLatex() {
 		// TODO Auto-generated method stub
 		return "\\ln("+ex1.toLatex()+")";
+	}
+	@Override
+	public List<CellIndex> getReferencedCells() {
+		List<CellIndex> ref = new ArrayList<CellIndex>();
+		for(CellIndex r : ex1.getReferencedCells())
+			ref.add(r);
+		return ref;
 	}
 
 }

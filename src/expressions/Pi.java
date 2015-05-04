@@ -1,5 +1,10 @@
 package expressions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import data.CellIndex;
+
 public class Pi extends Expression implements Const {
 	private static String TOKEN = "PI";
 	public Pi(){}
@@ -25,4 +30,8 @@ public class Pi extends Expression implements Const {
 		return "\\pi";
 	}
 
+	@Override
+	public List<CellIndex> getReferencedCells() {
+		return new ArrayList<CellIndex>();
+	}
 }

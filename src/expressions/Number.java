@@ -1,5 +1,10 @@
 package expressions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import data.CellIndex;
+
 public class Number extends Expression {
 	double val;
 	
@@ -24,6 +29,12 @@ public class Number extends Expression {
 		if (val - Math.round(val) <0.005)
 			return String.format( "%.0f", val);
 		return  String.format( "%.2f", val);
+	}
+
+	@Override
+	public List<CellIndex> getReferencedCells() {
+		// TODO Auto-generated method stub
+		return new ArrayList<CellIndex>();
 	}
 
 }

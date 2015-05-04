@@ -1,6 +1,7 @@
 package data;
 
-import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 
 import expressions.Expression;
 
@@ -16,7 +17,8 @@ public class Cell {
 	private Double calculatedValue; // this is the current calculated value for
 									// the cell
 	private Expression calculatedExpression;
-
+	public HashSet<CellIndex> referencedBy = new HashSet<CellIndex>();
+	
 	public Cell(String text) {
 		this.text = text;
 		calculatedValue = null;
@@ -70,6 +72,10 @@ public class Cell {
 
 	public String getText() {
 		return text;
+	}
+	
+	public List<CellIndex> getReferences(){
+		return calculatedExpression.getReferencedCells();
 	}
 
 	public boolean isEmpty() {

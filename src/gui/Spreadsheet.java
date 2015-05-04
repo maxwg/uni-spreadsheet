@@ -47,7 +47,6 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 	/**
 	 * Spreadsheet - a simple spreadsheet program. Eric McCreath 2015
 	 */
-	private static final String CALCULATECOMMAND = "calculatecommand";
 
 	JFrame jframe;
 	public WorksheetView worksheetview;
@@ -143,8 +142,16 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 
 				@Override
 				public void focusLost(FocusEvent e) {
+					for(CellIndex i : worksheetview.getPreviousIndex().getCell().referencedBy)
+						i.getCell().calcuate(worksheet);
+					for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
+						i.getCell().referencedBy.remove(worksheetview.getPreviousIndex());
 					worksheetview.getPreviousIndex().getCell()
 							.calcuate(worksheet);
+					worksheetview.getPreviousIndex().referencedCells = worksheetview.getPreviousIndex().getCell().getReferences();
+					for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
+						i.getCell().referencedBy.add(worksheetview.getPreviousIndex());
+					update();
 				}
 
 				@Override

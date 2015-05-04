@@ -1,5 +1,10 @@
 package expressions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import data.CellIndex;
+
 public class Add extends Expression implements BinaryOp{
 	Expression ex1;
 	Expression ex2;
@@ -33,6 +38,15 @@ public class Add extends Expression implements BinaryOp{
 	@Override
 	public String toLatex() {
 		return ex1.toLatex() +"+"+ex2.toLatex();
+	}
+	@Override
+	public List<CellIndex> getReferencedCells() {
+		List<CellIndex> ref = new ArrayList<CellIndex>();
+		for(CellIndex r : ex1.getReferencedCells())
+			ref.add(r);
+		for(CellIndex r : ex2.getReferencedCells())
+			ref.add(r);
+		return ref;
 	}
 
 }

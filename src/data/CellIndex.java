@@ -1,6 +1,7 @@
 package data;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import expressions.Expression;
 
@@ -19,6 +20,7 @@ public class CellIndex extends Expression {
 	// e.g. cell index A1 will be row 0 and column 0.
 	
 	WorkSheet worksheet;
+	public List<CellIndex> referencedCells= new ArrayList<CellIndex>();
 	
 	public CellIndex(int column, int row, WorkSheet worksheet) {
 		this.row = row;
@@ -61,5 +63,13 @@ public class CellIndex extends Expression {
 	public String toLatex() {
 		// TODO Auto-generated method stub
 		return show();
+	}
+
+	@Override
+	public List<CellIndex> getReferencedCells() {
+		// TODO Auto-generated method stub
+		List<CellIndex> ref = new ArrayList<CellIndex>();
+		ref.add(this);
+		return ref;
 	}
 }

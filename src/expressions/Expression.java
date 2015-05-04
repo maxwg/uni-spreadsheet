@@ -1,11 +1,11 @@
 package expressions;
 
-import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 import data.CellIndex;
 import data.WorkSheet;
@@ -21,8 +21,8 @@ import dataStructures.ListStream;
  *          MAY NEED MULTIPLICATION DIVISION PRECEDENCE!
  */
 // aexp ::= mexp <AdditiveBinaryOp> aexp | mexp
-// mexp ::= dexp <MultiplicativeBinaryOp> mexp | dexp (ImpliedMult) mexp | dexp
-// dexp ::= pexp <DivisiveBinaryOp> dexp | pexp
+// mexp ::= dexp <MultiplicativeBinaryOp> mexp | dexp
+// dexp ::= pexp <DivisiveBinaryOp> dexp | fexp (ImpliedMult) dexp | pexp
 // pexp ::= fexp <ExponentialBinaryOp> pexp | fexp
 // fexp ::= <FunctionOp>(aexp[]) | vexp
 // vexp ::= (aexp) | <Number> | <Const> | <CellRef>
@@ -33,6 +33,8 @@ public abstract class Expression {
 	public abstract double evaluate();
 
 	public abstract String toLatex();
+	
+	public abstract List<CellIndex> getReferencedCells();
 
 	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
 	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };
@@ -93,18 +95,18 @@ public abstract class Expression {
 	public static Expression parseMEXP(ListStream tokens) throws Exception {
 		return parseBinaryExp(tokens, mexp, (Expression.class.getMethod(
 				"parseDEXP", ListStream.class)), (Expression.class.getMethod(
-				"implicitMultiplication", Expression.class, ListStream.class)));
+				"doNothing", Expression.class, ListStream.class)));
 	}
 
 	public static Expression parseDEXP(ListStream tokens) throws Exception {
 		return parseBinaryExp(tokens, dexp, (Expression.class.getMethod(
 				"parsePEXP", ListStream.class)), (Expression.class.getMethod(
-				"doNothing", Expression.class, ListStream.class)));
+				"implicitMultiplication", Expression.class, ListStream.class)));
 	}
 
 	public static Expression implicitMultiplication(Expression exp1,
 			ListStream tokens) throws Exception {
-		if (!tokens.isEnd()) {
+		if (!tokens.hasEnded()) {
 			boolean curInAEXP = false;
 			for (String sym : operatorSymbols)
 				if (sym.equals(tokens.current()))
@@ -113,7 +115,6 @@ public abstract class Expression {
 				boolean impliedWithBrackets = false;
 				if ("(".equals(tokens.current())) {
 					impliedWithBrackets = true;
-					System.out.println("IMPLIEDWITHBRACKETS");
 					tokens.next();
 				}
 				Expression exp2 = parseMEXP(tokens);
@@ -151,7 +152,6 @@ public abstract class Expression {
 				}
 				exprs.add(parseAEXP(tokens));
 				validateCurrent(tokens, ")");
-				System.out.println(tokens.current());
 				Class<Expression>[] expclass = new Class[exprs.size()];
 				for (int i = 0; i < exprs.size(); i++)
 					expclass[i] = Expression.class;
@@ -169,12 +169,10 @@ public abstract class Expression {
 			tokens.next();
 			Expression exp = parseAEXP(tokens);
 			validateCurrent(tokens, ")");
-			System.out.println(tokens.current());
 			return new Brackets(exp);
 		}
 		for (Class<Const> inst : consts) {
 			Const con = inst.newInstance();
-			;
 			if (tokens.current() instanceof String
 					&& con.getToken().equals(
 							((String) tokens.current()).toUpperCase())) {
@@ -201,7 +199,6 @@ public abstract class Expression {
 	public static void validateCurrent(ListStream tokens, String val)
 			throws ParseException {
 		if (!val.equals(tokens.current())){
-			System.out.println(tokens.current() + " - "+val);
 			throw new ParseException();
 		}
 		tokens.next();
