@@ -1,7 +1,6 @@
 package expressions;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import data.CellIndex;
 
@@ -28,10 +27,5 @@ public class Pi extends Expression implements Const {
 	@Override
 	public String toLatex() {
 		return "\\pi";
-	}
-
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		return new ArrayList<CellIndex>();
 	}
 }

@@ -2,6 +2,7 @@ package expressions;
 
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,8 +34,19 @@ public abstract class Expression {
 	public abstract double evaluate();
 
 	public abstract String toLatex();
-	
-	public abstract List<CellIndex> getReferencedCells();
+	public List<CellIndex> getReferencedCells() throws IllegalArgumentException, IllegalAccessException{
+		List<CellIndex> refCells = new ArrayList<CellIndex>();
+		if(this instanceof CellIndex){
+			refCells.add((CellIndex)this);
+		}
+		else{
+			for(Field f : this.getClass().getDeclaredFields())
+				if (f.getType().equals(Expression.class))
+					for(CellIndex c :((Expression)f.get(this)).getReferencedCells())
+						refCells.add(c);
+		}
+		return refCells;
+	}
 
 	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
 	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };

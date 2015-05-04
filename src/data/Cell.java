@@ -74,7 +74,7 @@ public class Cell {
 		return text;
 	}
 	
-	public List<CellIndex> getReferences(){
+	public List<CellIndex> getReferences() throws IllegalArgumentException, IllegalAccessException{
 		return calculatedExpression.getReferencedCells();
 	}
 

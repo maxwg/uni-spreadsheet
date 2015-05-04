@@ -40,13 +40,4 @@ public class Sin extends Expression implements FunctionOp {
 	public String toLatex() {
 		return "\\sin\\left("+ex1.toLatex()+"\\right)";
 	}
-
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		List<CellIndex> ref = new ArrayList<CellIndex>();
-		for(CellIndex r : ex1.getReferencedCells())
-			ref.add(r);
-		return ref;
-	}
-
 }

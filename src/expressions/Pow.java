@@ -39,14 +39,4 @@ public class Pow extends Expression implements BinaryOp{
 	public String toLatex() {
 		return "\\left("+ex1.toLatex()+"\\right)^{"+ex2.toLatex()+"}";
 	}
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		List<CellIndex> ref = new ArrayList<CellIndex>();
-		for(CellIndex r : ex1.getReferencedCells())
-			ref.add(r);
-		for(CellIndex r : ex2.getReferencedCells())
-			ref.add(r);
-		return ref;
-	}
-
 }

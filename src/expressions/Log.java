@@ -42,14 +42,4 @@ public class Log extends Expression implements FunctionOp {
 	public String toLatex() {
 		return "\\log_{"+base.toLatex()+"} \\left( "+ex1.toLatex()+"\\right)";
 	}
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		List<CellIndex> ref = new ArrayList<CellIndex>();
-		for(CellIndex r : ex1.getReferencedCells())
-			ref.add(r);
-		for(CellIndex r : base.getReferencedCells())
-			ref.add(r);
-		return ref;
-	}
-
 }

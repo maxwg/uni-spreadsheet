@@ -41,12 +41,4 @@ public class Ln extends Expression implements FunctionOp {
 		// TODO Auto-generated method stub
 		return "\\ln("+ex1.toLatex()+")";
 	}
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		List<CellIndex> ref = new ArrayList<CellIndex>();
-		for(CellIndex r : ex1.getReferencedCells())
-			ref.add(r);
-		return ref;
-	}
-
 }

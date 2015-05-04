@@ -148,7 +148,12 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 						i.getCell().referencedBy.remove(worksheetview.getPreviousIndex());
 					worksheetview.getPreviousIndex().getCell()
 							.calcuate(worksheet);
-					worksheetview.getPreviousIndex().referencedCells = worksheetview.getPreviousIndex().getCell().getReferences();
+					try {
+						worksheetview.getPreviousIndex().referencedCells = worksheetview.getPreviousIndex().getCell().getReferences();
+					} catch (IllegalArgumentException | IllegalAccessException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
 						i.getCell().referencedBy.add(worksheetview.getPreviousIndex());
 					update();

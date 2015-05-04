@@ -64,12 +64,4 @@ public class CellIndex extends Expression {
 		// TODO Auto-generated method stub
 		return show();
 	}
-
-	@Override
-	public List<CellIndex> getReferencedCells() {
-		// TODO Auto-generated method stub
-		List<CellIndex> ref = new ArrayList<CellIndex>();
-		ref.add(this);
-		return ref;
-	}
 }
