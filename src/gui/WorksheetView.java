@@ -23,7 +23,7 @@ import data.WorkSheet;
 
 public class WorksheetView extends JTable implements TableModel {
 
-	private static final int NUMROWS = 20;
+	private static final int NUMROWS = 100;
 	private static final int NUMCOL = 26;
 	private static final int FIRSTCOLUMNWIDTH = 20;
 	private static final int COLUMNWIDTH = 50;

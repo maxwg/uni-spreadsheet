@@ -18,7 +18,7 @@ public class Sin extends Expression implements FunctionOp {
 
 	@Override
 	public String show() {
-		return "sin(" + ex1.show() + ")";
+		return "sin" + ex1.show();
 	}
 
 	@Override
@@ -38,6 +38,6 @@ public class Sin extends Expression implements FunctionOp {
 
 	@Override
 	public String toLatex() {
-		return "\\sin\\left("+ex1.toLatex()+"\\right)";
+		return "\\sin"+ex1.toLatex();
 	}
 }

@@ -18,7 +18,7 @@ public class Cos extends Expression implements FunctionOp {
 
 	@Override
 	public String show() {
-		return "cos(" + ex1.show() + ")";
+		return "cos" + ex1.show();
 	}
 
 	@Override
@@ -38,6 +38,6 @@ public class Cos extends Expression implements FunctionOp {
 
 	@Override
 	public String toLatex() {
-		return "\\cos\\left("+ex1.toLatex()+"\\right)";
+		return "\\cos"+ex1.toLatex();
 	}
 }

@@ -10,7 +10,8 @@ import java.util.List;
 
 import data.CellIndex;
 import data.WorkSheet;
-import dataStructures.ListStream;
+import dataStructures.ListStreamReverse;
+import dataStructures.Stream;
 
 /**
  * @author max
@@ -19,11 +20,13 @@ import dataStructures.ListStream;
  *          associate unambiguous grammar which should possess traditional
  *          mathematical precedence rules. The grammar is as follows:
  * 
- *          MAY NEED MULTIPLICATION DIVISION PRECEDENCE!
+ *          FIX DIVISION PRECEDENCE!
  */
-// aexp ::= mexp <AdditiveBinaryOp> aexp | mexp
+// aexp ::= sexp <AdditiveBinaryOp> aexp | sexp
+// sexp ::= mexp <SubtractOp> sexp | mexp
 // mexp ::= dexp <MultiplicativeBinaryOp> mexp | dexp
-// dexp ::= pexp <DivisiveBinaryOp> dexp | fexp (ImpliedMult) dexp | pexp
+// dexp ::= iexp <DivisiveBinaryOp> dexp | iexp
+// iexp ::= pexp (ImpliedMult) iexp | pexp
 // pexp ::= fexp <ExponentialBinaryOp> pexp | fexp
 // fexp ::= <FunctionOp>(aexp[]) | vexp
 // vexp ::= (aexp) | <Number> | <Const> | <CellRef>
@@ -34,21 +37,33 @@ public abstract class Expression {
 	public abstract double evaluate();
 
 	public abstract String toLatex();
-	public List<CellIndex> getReferencedCells() throws IllegalArgumentException, IllegalAccessException{
+
+	public List<CellIndex> getReferencedCells()
+			throws IllegalArgumentException, IllegalAccessException {
 		List<CellIndex> refCells = new ArrayList<CellIndex>();
-		if(this instanceof CellIndex){
-			refCells.add((CellIndex)this);
-		}
-		else{
-			for(Field f : this.getClass().getDeclaredFields())
+		if (this instanceof CellIndex) {
+			refCells.add((CellIndex) this);
+		} else {
+			for (Field f : this.getClass().getDeclaredFields())
 				if (f.getType().equals(Expression.class))
-					for(CellIndex c :((Expression)f.get(this)).getReferencedCells())
+					for (CellIndex c : ((Expression) f.get(this))
+							.getReferencedCells())
 						refCells.add(c);
 		}
 		return refCells;
 	}
 
-	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
+	public List<Expression> getInnerExpressions()
+			throws IllegalArgumentException, IllegalAccessException {
+		List<Expression> innerExpressions = new ArrayList<Expression>();
+		for (Field f : this.getClass().getDeclaredFields())
+			if (f.getType().equals(Expression.class))
+				innerExpressions.add((Expression) f.get(this));
+		return innerExpressions;
+	}
+
+	private static Class<BinaryOp>[] aexp = new Class[] { Add.class };
+	private static Class<BinaryOp>[] sexp = new Class[] { Sub.class };
 	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };
 	private static Class<BinaryOp>[] mexp = new Class[] { Mult.class };
 	private static Class<BinaryOp>[] pexp = new Class[] { Pow.class };
@@ -58,13 +73,15 @@ public abstract class Expression {
 		try {
 			for (Class<BinaryOp> inst : aexp)
 				operatorSymbols.add(inst.newInstance().getToken());
+			for (Class<BinaryOp> inst : sexp)
+				operatorSymbols.add(inst.newInstance().getToken());
 			for (Class<BinaryOp> inst : dexp)
 				operatorSymbols.add(inst.newInstance().getToken());
 			for (Class<BinaryOp> inst : mexp)
 				operatorSymbols.add(inst.newInstance().getToken());
 			for (Class<BinaryOp> inst : pexp)
 				operatorSymbols.add(inst.newInstance().getToken());
-			operatorSymbols.add(")");
+			operatorSymbols.add("(");
 			operatorSymbols.add(",");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,11 +89,11 @@ public abstract class Expression {
 		}
 	}
 	private static Class<FunctionOp>[] fexp = new Class[] { Sin.class,
-			Cos.class, Ln.class, Log.class };
-	private static Class<Const>[] consts = new Class[] { Pi.class };
+			Cos.class, Ln.class, Log.class, Neg.class };
+	private static Class<Const>[] consts = new Class[] { Pi.class, E.class };
 	private static WorkSheet worksheet;
 
-	private static Expression parseBinaryExp(ListStream tokens,
+	private static Expression parseBinaryExp(Stream tokens,
 			Class<BinaryOp>[] lexp, Method nextParse,
 			Method additionalProcessing) throws Exception {
 		Expression exp1 = (Expression) nextParse.invoke(null, tokens);
@@ -87,100 +104,123 @@ public abstract class Expression {
 				Expression exp2 = parseBinaryExp(tokens, lexp, nextParse,
 						additionalProcessing);
 				return (Expression) binop.getConstructor(Expression.class,
-						Expression.class).newInstance(exp1, exp2);
+						Expression.class).newInstance(exp2, exp1);
+			}
+
+		}
+		return exp1;
+	}
+
+	public static void doNothing(Expression prev, Stream tokens) {
+	}
+
+	public static Expression parseAEXP(Stream tokens) throws Exception {
+		return parseBinaryExp(tokens, aexp, (Expression.class.getMethod(
+				"parseSEXP", Stream.class)), (Expression.class.getMethod(
+				"doNothing", Expression.class, Stream.class)));
+	}
+
+	public static Expression parseSEXP(Stream tokens) throws Exception {
+		Expression exp1 = parseMEXP(tokens);
+		if (!tokens.hasEnded()) {
+			if ("-".equals(tokens.peekPrevious())) {
+				Expression exp2 = parseSEXP(tokens);
+				return new Sub(exp2, exp1.getInnerExpressions().get(0));
+			} else if ("-".equals(tokens.current())) {
+				tokens.next();
+				Expression exp2 = parseSEXP(tokens);
+				return new Sub(exp2, exp1);
 			}
 		}
-		Expression additional = (Expression) additionalProcessing.invoke(null,
-				exp1, tokens);
-		return additional == null ? exp1 : additional;
+		return exp1;
 	}
 
-	public static void doNothing(Expression prev, ListStream tokens) {
-	}
-
-	public static Expression parseAEXP(ListStream tokens) throws Exception {
-		return parseBinaryExp(tokens, aexp, (Expression.class.getMethod(
-				"parseMEXP", ListStream.class)), (Expression.class.getMethod(
-				"doNothing", Expression.class, ListStream.class)));
-	}
-
-	public static Expression parseMEXP(ListStream tokens) throws Exception {
+	public static Expression parseMEXP(Stream tokens) throws Exception {
 		return parseBinaryExp(tokens, mexp, (Expression.class.getMethod(
-				"parseDEXP", ListStream.class)), (Expression.class.getMethod(
-				"doNothing", Expression.class, ListStream.class)));
+				"parseDEXP", Stream.class)), (Expression.class.getMethod(
+				"doNothing", Expression.class, Stream.class)));
 	}
 
-	public static Expression parseDEXP(ListStream tokens) throws Exception {
+	public static Expression parseDEXP(Stream tokens) throws Exception {
 		return parseBinaryExp(tokens, dexp, (Expression.class.getMethod(
-				"parsePEXP", ListStream.class)), (Expression.class.getMethod(
-				"implicitMultiplication", Expression.class, ListStream.class)));
+				"implicitMultiplication", Stream.class)),
+				(Expression.class.getMethod("doNothing", Expression.class,
+						Stream.class)));
 	}
 
-	public static Expression implicitMultiplication(Expression exp1,
-			ListStream tokens) throws Exception {
+	public static Expression implicitMultiplication(Stream tokens)
+			throws Exception {
+		Expression exp1 = parsePEXP(tokens);
 		if (!tokens.hasEnded()) {
 			boolean curInAEXP = false;
 			for (String sym : operatorSymbols)
 				if (sym.equals(tokens.current()))
 					curInAEXP = true;
-			if (!curInAEXP) {
-				boolean impliedWithBrackets = false;
-				if ("(".equals(tokens.current())) {
-					impliedWithBrackets = true;
-					tokens.next();
-				}
-				Expression exp2 = parseMEXP(tokens);
-				if (impliedWithBrackets){
-					validateCurrent(tokens, ")");
-					return new Brackets(new Mult(exp1, exp2));
-				}
-				
-				return new Mult(exp1, exp2);
+			if (!curInAEXP && !(exp1 instanceof Neg)) {
+				Expression exp2 = implicitMultiplication(tokens);
+				return new Mult(exp2, exp1);
 			}
 		}
-		return null;
+		return exp1;
 	}
 
-	public static Expression parsePEXP(ListStream tokens) throws Exception {
+	public static Expression parsePEXP(Stream tokens) throws Exception {
 		return parseBinaryExp(tokens, pexp, (Expression.class.getMethod(
-				"parseFEXP", ListStream.class)), (Expression.class.getMethod(
-				"doNothing", Expression.class, ListStream.class)));
+				"parseFEXP", Stream.class)), (Expression.class.getMethod(
+				"doNothing", Expression.class, Stream.class)));
 	}
 
-	public static Expression parseFEXP(ListStream tokens) throws Exception {
-		for (Class<FunctionOp> unop : fexp) {
-			FunctionOp inst = unop.newInstance();
-			if ((tokens.current() instanceof String)
-					&& ((String) tokens.current()).toUpperCase().equals(
-							inst.getToken())) {
-				if (!"(".equals(tokens.next()))
-					throw new ParseException();
-				ArrayList<Expression> exprs = new ArrayList<Expression>();
-				int pars = inst.noParameters();
-				tokens.next();
-				for (; pars > 1; pars--) {
-					exprs.add(parseAEXP(tokens));
-					validateCurrent(tokens, ",");
+	// public static Expression parseFEXP(Stream tokens) throws Exception {
+	// for (Class<FunctionOp> unop : fexp) {
+	// FunctionOp inst = unop.newInstance();
+	// if ((tokens.current() instanceof String)
+	// && ((String) tokens.current()).toUpperCase().equals(
+	// inst.getToken())) {
+	// if (!")".equals(tokens.next()))
+	// throw new ParseException();
+	// ArrayList<Expression> exprs = new ArrayList<Expression>();
+	// int pars = inst.noParameters();
+	// tokens.next();
+	// for (; pars > 1; pars--) {
+	// exprs.add(parseAEXP(tokens));
+	// validateCurrent(tokens, ",");
+	// }
+	// exprs.add(parseAEXP(tokens));
+	// validateCurrent(tokens, "(");
+	// Class<Expression>[] expclass = new Class[exprs.size()];
+	// for (int i = 0; i < exprs.size(); i++)
+	// expclass[i] = Expression.class;
+	// return (Expression) unop.getConstructor(expclass).newInstance(
+	// exprs.toArray());
+	// }
+	// }
+	// return parseVEXP(tokens);
+	// }
+
+	public static Expression parseFEXP(Stream tokens) throws Exception {
+		Expression exp1 = parseVEXP(tokens);
+		if (!tokens.hasEnded() && exp1 instanceof Brackets) {
+			for (Class<FunctionOp> unop : fexp) {
+				FunctionOp inst = unop.newInstance();
+				if ((tokens.current() instanceof String)
+						&& ((String) tokens.current()).toUpperCase().equals(
+								inst.getToken())) {
+					tokens.next();
+					return (Expression) unop.getConstructor(Expression.class)
+							.newInstance(exp1);
 				}
-				exprs.add(parseAEXP(tokens));
-				validateCurrent(tokens, ")");
-				Class<Expression>[] expclass = new Class[exprs.size()];
-				for (int i = 0; i < exprs.size(); i++)
-					expclass[i] = Expression.class;
-				return (Expression) unop.getConstructor(expclass).newInstance(
-						exprs.toArray());
 			}
 		}
-		return parseVEXP(tokens);
+		return exp1;
 	}
 
-	public static Expression parseVEXP(ListStream tokens) throws Exception {
+	public static Expression parseVEXP(Stream tokens) throws Exception {
 		if (tokens.hasEnded())
 			throw new ParseException();
-		if ("(".equals(tokens.current())) {
+		if (")".equals(tokens.current())) {
 			tokens.next();
 			Expression exp = parseAEXP(tokens);
-			validateCurrent(tokens, ")");
+			validateCurrent(tokens, "(");
 			return new Brackets(exp);
 		}
 		for (Class<Const> inst : consts) {
@@ -208,15 +248,16 @@ public abstract class Expression {
 		return exp;
 	}
 
-	public static void validateCurrent(ListStream tokens, String val)
+	public static void validateCurrent(Stream tokens, String val)
 			throws ParseException {
-		if (!val.equals(tokens.current())){
+		if (!val.equals(tokens.current())) {
 			throw new ParseException();
 		}
 		tokens.next();
 	}
 
-	public static Expression calculate(String expr, WorkSheet ws) throws Exception {
+	public static Expression calculate(String expr, WorkSheet ws)
+			throws Exception {
 		worksheet = ws;
 		StreamTokenizer tok = new StreamTokenizer(new StringReader(expr));
 		tok.ordinaryChar('/');
@@ -225,7 +266,8 @@ public abstract class Expression {
 		while ((tVal = tok.nextToken()) != StreamTokenizer.TT_EOF) {
 			switch (tVal) {
 			case StreamTokenizer.TT_NUMBER:
-				Object ptoken = tokens.size() - 1 > 0 ? tokens.get(tokens.size() - 1) : null;
+				Object ptoken = tokens.size() > 0 ? tokens
+						.get(tokens.size() - 1) : null;
 				if (tok.nval < 0
 						&& (ptoken instanceof Double || ")".equals(ptoken))) {
 					tokens.add("-");
@@ -235,13 +277,13 @@ public abstract class Expression {
 				break;
 			case StreamTokenizer.TT_WORD:
 				String[] s = tok.sval.split("-");
-				for(int i = 0; i < s.length; i++){
-					try{
+				for (int i = 0; i < s.length; i++) {
+					try {
 						tokens.add(Double.parseDouble(s[i]));
-					}catch(NumberFormatException e){
+					} catch (NumberFormatException e) {
 						tokens.add(s[i]);
 					}
-					if (i <s.length-1)
+					if (i < s.length - 1)
 						tokens.add("-");
 				}
 				break;
@@ -251,10 +293,11 @@ public abstract class Expression {
 			}
 		}
 		try {
-			return parseAEXP(new ListStream(tokens));
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException
-				| IllegalArgumentException |  NoSuchMethodException | SecurityException | ParseException e) {
-			//e.printStackTrace();
+			return parseAEXP(new ListStreamReverse(tokens));
+		} catch (InstantiationException | IllegalAccessException
+				| InvocationTargetException | IllegalArgumentException
+				| NoSuchMethodException | SecurityException | ParseException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

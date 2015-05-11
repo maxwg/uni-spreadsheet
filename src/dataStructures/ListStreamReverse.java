@@ -2,14 +2,14 @@ package dataStructures;
 
 import java.util.List;
 
-public class ListStream implements Stream{
+public class ListStreamReverse implements Stream{
 	List<Object> l;
 	int cPos;
 	boolean reachedEnd = false;
 
-	public ListStream(List<Object> l) {
+	public ListStreamReverse(List<Object> l) {
 		this.l = l;
-		cPos = 0;
+		cPos = l.size()-1;
 	}
 
 	public Object current() {
@@ -20,14 +20,14 @@ public class ListStream implements Stream{
 
 	public Object peekNext() {
 		if (this.hasNext()) {
-			return l.get(cPos + 1);
+			return l.get(cPos - 1);
 		}
 		return null;
 	}
 
 	public Object next() {
 		if (this.hasNext()) {
-			cPos++;
+			cPos--;
 			return current();
 		}
 		reachedEnd = true;
@@ -39,17 +39,17 @@ public class ListStream implements Stream{
 	}
 
 	public boolean hasNext() {
-		return cPos < l.size() - 1;
+		return cPos > 0;
 	}
 
 	public boolean isEnd() {
-		return cPos == l.size() - 1;
+		return cPos == 0;
 	}
-	
+
 	@Override
 	public Object peekPrevious() {
-		if(cPos-1 >= 0 )
-			return l.get(cPos-1);
+		if(cPos+1 < l.size())
+			return l.get(cPos+1);
 		return null;
 	}
 }

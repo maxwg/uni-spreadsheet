@@ -18,7 +18,7 @@ public class Ln extends Expression implements FunctionOp {
 
 	@Override
 	public String show() {
-		return "ln(" + ex1.show() + ")";
+		return "ln" + ex1.show();
 	}
 
 	@Override
@@ -39,6 +39,6 @@ public class Ln extends Expression implements FunctionOp {
 	@Override
 	public String toLatex() {
 		// TODO Auto-generated method stub
-		return "\\ln("+ex1.toLatex()+")";
+		return "\\ln"+ex1.toLatex();
 	}
 }

@@ -39,13 +39,18 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 import data.Cell;
 import data.CellIndex;
 import data.WorkSheet;
-
+/**
+ * Dont forget copyright crap
+ * @author max
+ *
+ */
 public class Spreadsheet implements Runnable, SelectionObserver,
 		DocumentListener {
 
 	private static final Dimension PREFEREDDIM = new Dimension(630, 400);
 	/**
 	 * Spreadsheet - a simple spreadsheet program. Eric McCreath 2015
+	 * Uses JLatexMaths to render maths.
 	 */
 
 	JFrame jframe;

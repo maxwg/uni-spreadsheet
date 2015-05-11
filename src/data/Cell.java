@@ -1,5 +1,6 @@
 package data;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class Cell {
 	}
 	
 	public List<CellIndex> getReferences() throws IllegalArgumentException, IllegalAccessException{
-		return calculatedExpression.getReferencedCells();
+		return calculatedExpression == null? new ArrayList<CellIndex>() : calculatedExpression.getReferencedCells();
 	}
 
 	public boolean isEmpty() {
