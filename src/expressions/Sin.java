@@ -1,29 +1,25 @@
 package expressions;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import data.CellIndex;
 
 public class Sin extends Expression implements FunctionOp {
-	Expression ex1;
+	Brackets exprs;
 	public static String SYMBOL = "SIN";
 
 	public Sin() {
 	}
 
-	public Sin(Expression ex1) {
-		this.ex1 = ex1;
+	public Sin(Brackets ex1) {
+		this.exprs = ex1;
 	}
 
 	@Override
 	public String show() {
-		return "sin" + ex1.show();
+		return "sin" + exprs.show();
 	}
 
 	@Override
 	public double evaluate() {
-		return Math.sin(ex1.evaluate());
+		return Math.sin(exprs.evaluate());
 	}
 
 	@Override
@@ -38,6 +34,6 @@ public class Sin extends Expression implements FunctionOp {
 
 	@Override
 	public String toLatex() {
-		return "\\sin"+ex1.toLatex();
+		return "\\sin"+exprs.toLatex();
 	}
 }

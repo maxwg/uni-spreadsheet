@@ -1,29 +1,25 @@
 package expressions;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import data.CellIndex;
 
 public class Cos extends Expression implements FunctionOp {
-	Expression ex1;
+	Brackets exprs;
 	public static String SYMBOL = "COS";
 
 	public Cos() {
 	}
 
-	public Cos(Expression ex1) {
-		this.ex1 = ex1;
+	public Cos(Brackets exprs) {
+		this.exprs = exprs;
 	}
 
 	@Override
 	public String show() {
-		return "cos" + ex1.show();
+		return "cos" + exprs.show();
 	}
 
 	@Override
 	public double evaluate() {
-		return Math.cos(ex1.evaluate());
+		return Math.cos(exprs.evaluate());
 	}
 
 	@Override
@@ -38,6 +34,6 @@ public class Cos extends Expression implements FunctionOp {
 
 	@Override
 	public String toLatex() {
-		return "\\cos"+ex1.toLatex();
+		return "\\cos"+exprs.toLatex();
 	}
 }

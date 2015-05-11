@@ -1,29 +1,25 @@
 package expressions;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import data.CellIndex;
 
 public class Ln extends Expression implements FunctionOp {
-	Expression ex1;
+	Brackets exprs;
 	public static String SYMBOL = "LN";
 
 	public Ln() {
 	}
 
-	public Ln(Expression ex1) {
-		this.ex1 = ex1;
+	public Ln(Brackets exprs) {
+		this.exprs = exprs;
 	}
 
 	@Override
 	public String show() {
-		return "ln" + ex1.show();
+		return "ln" + exprs.show();
 	}
 
 	@Override
 	public double evaluate() {
-		return Math.log(ex1.evaluate());
+		return Math.log(exprs.evaluate());
 	}
 
 	@Override
@@ -39,6 +35,6 @@ public class Ln extends Expression implements FunctionOp {
 	@Override
 	public String toLatex() {
 		// TODO Auto-generated method stub
-		return "\\ln"+ex1.toLatex();
+		return "\\ln"+exprs.toLatex();
 	}
 }

@@ -1,8 +1,5 @@
 package expressions;
 
-import java.util.ArrayList;
-
-import data.CellIndex;
 
 public class Number extends Expression {
 	double val;

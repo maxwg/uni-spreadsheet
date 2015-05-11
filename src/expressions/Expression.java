@@ -19,14 +19,11 @@ import dataStructures.Stream;
  * @grammar The grammar used in these expressions is a context free, left
  *          associate unambiguous grammar which should possess traditional
  *          mathematical precedence rules. The grammar is as follows:
- * 
- *          FIX DIVISION PRECEDENCE!
  */
-// aexp ::= sexp <AdditiveBinaryOp> aexp | sexp
-// sexp ::= mexp <SubtractOp> sexp | mexp
+// aexp ::= mexp <AdditiveBinaryOp> aexp | mexp
 // mexp ::= dexp <MultiplicativeBinaryOp> mexp | dexp
 // dexp ::= iexp <DivisiveBinaryOp> dexp | iexp
-// iexp ::= pexp (ImpliedMult) iexp | pexp
+// iexp ::= pexp (ImpliedMult) iexp | <Neg> pexp
 // pexp ::= fexp <ExponentialBinaryOp> pexp | fexp
 // fexp ::= <FunctionOp>(aexp[]) | vexp
 // vexp ::= (aexp) | <Number> | <Const> | <CellRef>
@@ -62,8 +59,7 @@ public abstract class Expression {
 		return innerExpressions;
 	}
 
-	private static Class<BinaryOp>[] aexp = new Class[] { Add.class };
-	private static Class<BinaryOp>[] sexp = new Class[] { Sub.class };
+	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
 	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };
 	private static Class<BinaryOp>[] mexp = new Class[] { Mult.class };
 	private static Class<BinaryOp>[] pexp = new Class[] { Pow.class };
@@ -72,8 +68,6 @@ public abstract class Expression {
 		operatorSymbols = new ArrayList<String>();
 		try {
 			for (Class<BinaryOp> inst : aexp)
-				operatorSymbols.add(inst.newInstance().getToken());
-			for (Class<BinaryOp> inst : sexp)
 				operatorSymbols.add(inst.newInstance().getToken());
 			for (Class<BinaryOp> inst : dexp)
 				operatorSymbols.add(inst.newInstance().getToken());
@@ -89,7 +83,7 @@ public abstract class Expression {
 		}
 	}
 	private static Class<FunctionOp>[] fexp = new Class[] { Sin.class,
-			Cos.class, Ln.class, Log.class, Neg.class };
+			Cos.class, Ln.class, Log.class };
 	private static Class<Const>[] consts = new Class[] { Pi.class, E.class };
 	private static WorkSheet worksheet;
 
@@ -99,7 +93,7 @@ public abstract class Expression {
 		Expression exp1 = (Expression) nextParse.invoke(null, tokens);
 		for (Class<BinaryOp> binop : lexp) {
 			BinaryOp inst = binop.newInstance();
-			if (inst.getToken().equals(tokens.current())) {
+			if (inst.getToken().equals(tokens.current()) && !tokens.hasEnded()) {
 				tokens.next();
 				Expression exp2 = parseBinaryExp(tokens, lexp, nextParse,
 						additionalProcessing);
@@ -116,23 +110,8 @@ public abstract class Expression {
 
 	public static Expression parseAEXP(Stream tokens) throws Exception {
 		return parseBinaryExp(tokens, aexp, (Expression.class.getMethod(
-				"parseSEXP", Stream.class)), (Expression.class.getMethod(
+				"parseMEXP", Stream.class)), (Expression.class.getMethod(
 				"doNothing", Expression.class, Stream.class)));
-	}
-
-	public static Expression parseSEXP(Stream tokens) throws Exception {
-		Expression exp1 = parseMEXP(tokens);
-		if (!tokens.hasEnded()) {
-			if ("-".equals(tokens.peekPrevious())) {
-				Expression exp2 = parseSEXP(tokens);
-				return new Sub(exp2, exp1.getInnerExpressions().get(0));
-			} else if ("-".equals(tokens.current())) {
-				tokens.next();
-				Expression exp2 = parseSEXP(tokens);
-				return new Sub(exp2, exp1);
-			}
-		}
-		return exp1;
 	}
 
 	public static Expression parseMEXP(Stream tokens) throws Exception {
@@ -143,24 +122,22 @@ public abstract class Expression {
 
 	public static Expression parseDEXP(Stream tokens) throws Exception {
 		return parseBinaryExp(tokens, dexp, (Expression.class.getMethod(
-				"implicitMultiplication", Stream.class)),
-				(Expression.class.getMethod("doNothing", Expression.class,
-						Stream.class)));
+				"implicitOperations", Stream.class)), (Expression.class
+				.getMethod("doNothing", Expression.class, Stream.class)));
 	}
 
-	public static Expression implicitMultiplication(Stream tokens)
-			throws Exception {
+	public static Expression implicitOperations(Stream tokens) throws Exception {
 		Expression exp1 = parsePEXP(tokens);
-		if (!tokens.hasEnded()) {
-			boolean curInAEXP = false;
-			for (String sym : operatorSymbols)
-				if (sym.equals(tokens.current()))
-					curInAEXP = true;
-			if (!curInAEXP && !(exp1 instanceof Neg)) {
-				Expression exp2 = implicitMultiplication(tokens);
+		if (!tokens.hasEnded())
+			if (!operatorSymbols.contains(tokens.current())) {
+				Expression exp2 = implicitOperations(tokens);
 				return new Mult(exp2, exp1);
+			} else if ("-".equals(tokens.current())
+					&& (!tokens.hasNext() || operatorSymbols.contains(tokens
+							.peekNext()))) {
+				tokens.next();
+				return new Neg(exp1);
 			}
-		}
 		return exp1;
 	}
 
@@ -205,9 +182,13 @@ public abstract class Expression {
 				if ((tokens.current() instanceof String)
 						&& ((String) tokens.current()).toUpperCase().equals(
 								inst.getToken())) {
+					if(inst.noParameters() != 0 && inst.noParameters() != ((Brackets)exp1).size()){
+						System.out.println(inst.noParameters() + "  " + ((Brackets)exp1).size());
+						throw new ParseException();
+					}
 					tokens.next();
-					return (Expression) unop.getConstructor(Expression.class)
-							.newInstance(exp1);
+					return (Expression) unop.getConstructor(Brackets.class)
+							.newInstance((Brackets)exp1);
 				}
 			}
 		}
@@ -218,10 +199,15 @@ public abstract class Expression {
 		if (tokens.hasEnded())
 			throw new ParseException();
 		if (")".equals(tokens.current())) {
+			ArrayList<Expression> args = new ArrayList<Expression>();
 			tokens.next();
-			Expression exp = parseAEXP(tokens);
+			args.add(parseAEXP(tokens));
+			while(",".equals(tokens.current())){
+				tokens.next();
+				args.add(parseAEXP(tokens));
+			}
 			validateCurrent(tokens, "(");
-			return new Brackets(exp);
+			return new Brackets(args.toArray(new Expression[args.size()]));
 		}
 		for (Class<Const> inst : consts) {
 			Const con = inst.newInstance();
@@ -241,6 +227,7 @@ public abstract class Expression {
 						worksheet);
 			} catch (ClassCastException | NumberFormatException
 					| IndexOutOfBoundsException ex) {
+				//System.err.println(tokens.current() + " is not a valid value token!");
 				throw new ParseException();
 			}
 		}

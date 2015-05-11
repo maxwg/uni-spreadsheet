@@ -1,43 +1,51 @@
 package expressions;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import data.CellIndex;
-
-public class Brackets extends Expression implements FunctionOp {
-	Expression ex1;
-	public static String SYMBOL = "";
+public class Brackets extends Expression {
+	Expression[] expressions;
 
 	public Brackets() {
 	}
 
-	public Brackets(Expression ex1) {
-		this.ex1 = ex1;
+	public Brackets(Expression[] expressions) {
+		this.expressions = expressions;
 	}
 
 	@Override
 	public String show() {
-		return "(" + ex1.show() + ")";
+		String show = "(";
+		for(Expression exp : expressions)
+			show += exp.show();
+			show += ", ";
+		show = show.substring(0, show.length()-2);
+		show += ")";
+		return show;
 	}
-
+	
+	public int size(){
+		return expressions.length;
+	}
+	
+	public Expression get(int expr){
+		return expressions[expr];
+	}
+	
 	@Override
 	public double evaluate() {
-		return ex1.evaluate();
+		return expressions[0].evaluate();
 	}
-
-	@Override
-	public String getToken() {
-		return SYMBOL;
+	
+	public double evaluate(int expr) {
+		return expressions[expr].evaluate();
 	}
-
-	@Override
-	public int noParameters() {
-		return 1;
-	}
-
 	@Override
 	public String toLatex() {
-		return "\\left("+ex1.toLatex()+"\\right)";
+		String show = "\\left(";
+		for(Expression exp : expressions)
+			show += exp.show();
+			show += ", ";
+		show = show.substring(0, show.length()-2);
+		show += "\\right)";
+		return show;
 	}
 }
