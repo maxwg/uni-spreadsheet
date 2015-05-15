@@ -2,6 +2,8 @@ package dataStructures;
 
 import java.util.List;
 
+import expressions.ParseException;
+
 public class ListStreamReverse implements Stream{
 	List<Object> l;
 	int cPos;
@@ -52,4 +54,33 @@ public class ListStreamReverse implements Stream{
 			return l.get(cPos+1);
 		return null;
 	}
+	
+	@Override
+	public void validateCurrent(String val)
+			throws ParseException {
+		if (!val.equals(this.current())) {
+			throw new ParseException("current token: "+this.current()+", expected :"+val);
+		}
+		this.next();
+	}
+	@Override
+	public void validateNext(String val)
+			throws ParseException {
+		if (!val.equals(this.next())) {
+			throw new ParseException("current token: "+this.current()+", expected :"+val+"\nAt: position "+position());
+		}
+	}
+
+	@Override
+	public int position() {
+		// TODO Auto-generated method stub
+		return cPos;
+	}
+
+	@Override
+	public void setPosition(int n) {
+		// TODO Auto-generated method stub
+		cPos = n;
+	}
+
 }

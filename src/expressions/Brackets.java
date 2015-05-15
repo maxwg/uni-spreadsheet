@@ -40,11 +40,12 @@ public class Brackets extends Expression {
 	}
 	@Override
 	public String toLatex() {
-		String show = "\\left(";
-		for(Expression exp : expressions)
-			show += exp.show();
-			show += ", ";
+		String show="";
+		for(Expression exp : expressions){
+			show = exp.toLatex()+", "+show;
+		}
 		show = show.substring(0, show.length()-2);
+		show = "\\left("+show;
 		show += "\\right)";
 		return show;
 	}

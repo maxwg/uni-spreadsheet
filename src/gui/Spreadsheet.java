@@ -86,6 +86,8 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 			};
 
 			worksheet = new WorkSheet();
+			functioneditor = new FunctionEditor(worksheet);
+			functioneditor.save();
 			worksheetview = new WorksheetView(worksheet, this);
 			worksheetview.addSelectionObserver(this);
 
@@ -176,8 +178,8 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 					80), new Color(24, 24, 24));
 
 			toolarea.add(eqScroll, BorderLayout.LINE_END);
-			functioneditor = new FunctionEditor(worksheet);
-
+			
+			
 			jframe.getContentPane().add(
 					new ModernScrollPane(worksheetview, new Color(24, 24, 100),
 							new Color(50, 50, 150)), BorderLayout.CENTER);
@@ -204,8 +206,7 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 								.getLatex(worksheet);
 					else
 						return;
-					latex = latex == null ? worksheetview.getSelectedIndex()
-							.getCell().text() : latex;
+					latex = "\\textrm{"+(latex == null ? "" : latex)+"}";
 					formula = new TeXFormula(latex);
 					if (!Thread.currentThread().isInterrupted())
 						icon = formula.new TeXIconBuilder()

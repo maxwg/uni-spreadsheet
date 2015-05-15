@@ -2,6 +2,8 @@ package dataStructures;
 
 import java.util.List;
 
+import expressions.ParseException;
+
 public interface Stream {
 
 	public Object current();
@@ -17,4 +19,12 @@ public interface Stream {
 	public boolean hasNext();
 
 	public boolean isEnd();
+	
+	public void validateCurrent(String expected) throws ParseException;
+	
+	public void validateNext(String expected) throws ParseException;
+	
+	public int position();
+	
+	public void setPosition(int n);
 }

@@ -25,10 +25,10 @@ import data.CellIndex;
 
 public class SpreadsheetTest {
 
-	protected static final String sumandmaxfunctions = "SUM(array values) {\n"
+	protected static final String sumandmaxfunctions = "SUM(n values) {\n"
 			+ "  double sum;" + "  int i;" + "  sum = 0.0;" + "  i = 0;"
 			+ "  while (i < #values) {" + "     sum = sum + values[i];" + "  }"
-			+ "  return sum;" + "}" + "MAX(array values) {\n"
+			+ "  return sum;" + "}" + "MAX(n values) {\n"
 			+ "  double max; " + "  int i;" + "  max = values[0];" + "  i = 1;"
 			+ "  while (i < #values) {" + "     if (values[i] > max) {"
 			+ "        max = values[i];" + "     }" + "  }" + "  return max;"
