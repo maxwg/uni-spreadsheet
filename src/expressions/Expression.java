@@ -66,7 +66,7 @@ public abstract class Expression {
 		return innerExpressions;
 	}
 
-	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class };
+	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class , Mod.class};
 	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };
 	private static Class<BinaryOp>[] mexp = new Class[] { Mult.class };
 	private static Class<BinaryOp>[] pexp = new Class[] { Pow.class };
