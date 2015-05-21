@@ -25,14 +25,6 @@ import data.CellIndex;
 
 public class SpreadsheetTest {
 
-	protected static final String sumandmaxfunctions = "SUM(n values) {\n"
-			+ "  double sum;" + "  int i;" + "  sum = 0.0;" + "  i = 0;"
-			+ "  while (i < #values) {" + "     sum = sum + values[i];" + "  }"
-			+ "  return sum;" + "}" + "MAX(n values) {\n"
-			+ "  double max; " + "  int i;" + "  max = values[0];" + "  i = 1;"
-			+ "  while (i < #values) {" + "     if (values[i] > max) {"
-			+ "        max = values[i];" + "     }" + "  }" + "  return max;"
-			+ "}";
 	Spreadsheet gui;
 
 	@Test
@@ -109,9 +101,8 @@ public class SpreadsheetTest {
 					selectAndSet(2, 3, "1.1");
 					selectAndSet(3, 3, "2.2");
 					selectAndSet(4, 3, "3.3");
-					selectAndSet(5, 3, "SUM(C3:C5)");
-					selectAndSet(6, 3, "MAX(C3:C5)");
-					gui.functioneditor.textarea.setText(sumandmaxfunctions);
+					selectAndSet(5, 3, "SUM(C3,C4,C5)");
+					selectAndSet(6, 3, "MAX(C3,C4,C5)");
 					gui.functioneditor.updateWorksheet();
 
 				}
