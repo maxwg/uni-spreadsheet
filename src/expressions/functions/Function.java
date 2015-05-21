@@ -102,7 +102,7 @@ public class Function extends Expression implements FunctionOp {
 			return Code.execute(variables, ws, code);
 		} catch (Exception e) {
 			//JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			//e.printStackTrace();
 			return 0;
 		}
 	}
@@ -110,6 +110,6 @@ public class Function extends Expression implements FunctionOp {
 	@Override
 	public String toLatex() {
 		// TODO Auto-generated method stub
-		return name + params.toLatex();
+		return "{\\tt " + name.toLowerCase() + "}" + params.toLatex();
 	}
 }

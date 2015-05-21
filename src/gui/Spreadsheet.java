@@ -149,21 +149,26 @@ public class Spreadsheet implements Runnable, SelectionObserver,
 
 				@Override
 				public void focusLost(FocusEvent e) {
-					for(CellIndex i : worksheetview.getPreviousIndex().getCell().referencedBy)
-						i.getCell().calcuate(worksheet);
-					for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
-						i.getCell().referencedBy.remove(worksheetview.getPreviousIndex());
-					worksheetview.getPreviousIndex().getCell()
-							.calcuate(worksheet);
-					try {
-						worksheetview.getPreviousIndex().referencedCells = worksheetview.getPreviousIndex().getCell().getReferences();
-					} catch (IllegalArgumentException | IllegalAccessException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
-						i.getCell().referencedBy.add(worksheetview.getPreviousIndex());
-					update();
+					(new Thread(){
+						@Override
+						public void run() {
+							for(CellIndex i : worksheetview.getPreviousIndex().getCell().referencedBy)
+								i.getCell().calcuate(worksheet);
+							for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
+								i.getCell().referencedBy.remove(worksheetview.getPreviousIndex());
+							worksheetview.getPreviousIndex().getCell()
+									.calcuate(worksheet);
+							try {
+								worksheetview.getPreviousIndex().referencedCells = worksheetview.getPreviousIndex().getCell().getReferences();
+							} catch (IllegalArgumentException | IllegalAccessException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							for(CellIndex i : worksheetview.getPreviousIndex().referencedCells)
+								i.getCell().referencedBy.add(worksheetview.getPreviousIndex());
+							update();
+						}
+					}).start();
 				}
 
 				@Override

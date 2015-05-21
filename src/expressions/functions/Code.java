@@ -2,6 +2,7 @@ package expressions.functions;
 
 import helpers.Tokenizer;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,11 +59,13 @@ public class Code {
 			HashMap<String, Object> variables, String token, Stream tokens,
 			WorkSheet ws) throws Exception {
 		String expval = "";
+		DecimalFormat df = new DecimalFormat("#");
+		df.setMaximumFractionDigits(10);
 		while (!(token.equals(tokens.next())) && !tokens.hasEnded()) {
 			if (variables.containsKey(tokens.current())) {
 				Object val = variables.get(tokens.current());
 				if (val instanceof Double)
-					expval += val + " ";
+					expval += df.format(val) + " ";
 				else if (val instanceof Brackets) {
 					tokens.validateNext("[");
 					String exp = parseStringExpandVars(variables, "]", tokens,

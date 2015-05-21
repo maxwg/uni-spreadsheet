@@ -38,6 +38,9 @@ public class FunctionEditor extends JDialog implements ActionListener {
 	private static String defaultFn1 = "max(n values){\n	i = 0;\n	max = -2000000;\n	while(i < #values){\n		if(values[i] > max){\n			max = values[i];\n		}\n		i=i+1;\n	}\n	return max;\n}\n\n";
 	private static String defaultFn2 = "sum(n values){\n	i = 0;\n	sum = 0;\n	while(i < #values){\n		sum = sum + values[i];\n		i=i+1;\n	}\n	return sum;\n}\n\n";
 	private static String defaultFn3 = "useless(3 nums){\n	return nums[0] - nums[1] * sin(nums[2]);\n}\n\n";
+	private static String defaultFn4 = "fact(1 num){\n i = 1;\n	fact = 1;\n	while(i <= num[0]){\n		fact = fact * i;\n		i=i+1;\n	}\n	return fact;\n}\n\n";
+	private static String defaultFn5 = "recurse(2 num){\n	return fact(num[0])/fact(num[1]);\n}";
+	private static String defaultFn6 = "inverseFact(1 num){\n	return 1/fact(num[0]);\n}\n\n";
 	
 	public FunctionEditor(WorkSheet worksheet) throws FontFormatException,
 			IOException {
@@ -50,7 +53,7 @@ public class FunctionEditor extends JDialog implements ActionListener {
 		textarea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		textarea.setTabSize(2);
 		textarea.setCaretColor(Color.WHITE);
-		textarea.setText(defaultFn1+defaultFn2+defaultFn3);
+		textarea.setText(defaultFn1+defaultFn2+defaultFn3+defaultFn6+defaultFn4+defaultFn5);
 		JButton closebutton = new ModernButton("Save", true);
 		closebutton.addActionListener(this);
 		this.setModal(true);
