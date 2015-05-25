@@ -20,6 +20,7 @@ import expressions.Expression;
  * text within cells of the spread sheet and check they evaluate correctly.
  * 
  * @author Eric McCreath
+ * 		   Max - Added more test data
  * 
  */
 
@@ -50,13 +51,14 @@ public class ExpressionTest {
 
 	@Test
 	public void testExpressionCalAuto() throws ScriptException {
+		ScriptEngineManager factory = new ScriptEngineManager();
+		ScriptEngine engine = factory.getEngineByName("JavaScript");
 		for (int i = 0; i < 10000; i++) {
 			String expr = generateRandomExpression();
-			ScriptEngineManager factory = new ScriptEngineManager();
-			ScriptEngine engine = factory.getEngineByName("JavaScript");
 			Object javResult = engine.eval(expr);
 			try {
 				double expResult = Expression.calculate(expr, null).evaluate();
+			//	System.out.println(javResult + "<--->" + expResult + ":::::::::::::::::: " + expr);
 				if (!(Math.abs(expResult
 						- Double.parseDouble(javResult.toString())) < Math
 						.abs(expResult) * ACCEPTABLEPRECISIONFACTOR)) {

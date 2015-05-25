@@ -37,6 +37,13 @@ public abstract class Expression {
 
 	public abstract String toLatex();
 
+	/**
+	 * Provides a list of cells referenced by the current expression. Uses
+	 * reflection to accomplish this for every class. Should not throw exception
+	 * despite throws
+	 * 
+	 * @return [CellIndex]
+	 */
 	public List<CellIndex> getReferencedCells()
 			throws IllegalArgumentException, IllegalAccessException {
 		List<CellIndex> refCells = new ArrayList<CellIndex>();
@@ -57,6 +64,13 @@ public abstract class Expression {
 		return refCells;
 	}
 
+	/**
+	 * Get all Expressions contained in the class (Does not recurse to lower
+	 * classes). Uses reflection to dynamically determine the expressions of the
+	 * class. Should not throw reflection despite throws.
+	 * 
+	 * @return [Expression]
+	 */
 	public List<Expression> getInnerExpressions()
 			throws IllegalArgumentException, IllegalAccessException {
 		List<Expression> innerExpressions = new ArrayList<Expression>();
@@ -66,10 +80,20 @@ public abstract class Expression {
 		return innerExpressions;
 	}
 
-	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class , Mod.class};
-	private static Class<BinaryOp>[] dexp = new Class[] { Div.class };
-	private static Class<BinaryOp>[] mexp = new Class[] { Mult.class };
-	private static Class<BinaryOp>[] pexp = new Class[] { Pow.class };
+	private static Class<BinaryOp>[] aexp = new Class[] { Add.class, Sub.class,
+			Mod.class }; // Addition level expressions
+	private static Class<BinaryOp>[] mexp = new Class[] { Mult.class };// Multiplication
+																		// level
+	private static Class<BinaryOp>[] dexp = new Class[] { Div.class }; // Division
+																		// level
+																		// (>
+																		// multiplication)
+	private static Class<BinaryOp>[] pexp = new Class[] { Pow.class }; // exponential
+																		// level
+	/**
+	 * Creates an array of all symbols contained within the program to enable
+	 * implicit operations
+	 */
 	private static ArrayList<String> operatorSymbols;
 	static {
 		operatorSymbols = new ArrayList<String>();
@@ -89,15 +113,30 @@ public abstract class Expression {
 			System.exit(-1);
 		}
 	}
-	public static ArrayList<Funclass> funs;
-	public static void refreshFuns() {
+	public static ArrayList<Funclass> funs; // Functions
+
+	public static void refreshFuns() { // Add all pre-defined functions
 		funs.addAll(Arrays.asList(new Funclass(Sin.class), new Funclass(
 				Cos.class), new Funclass(Ln.class), new Funclass(Log.class)));
 	}
 
-	private static Class<Const>[] consts = new Class[] { Pi.class, E.class };
+	private static Class<Const>[] consts = new Class[] { Pi.class, E.class }; // Constants
 	private static WorkSheet worksheet;
 
+	/**
+	 * Parse any expression in the form of <Expression> <OP> <Expression>
+	 * 
+	 * Uses dynamic instantiation and reflection to generalise to all classes.
+	 * Note: Despite the throws - no exception should be thrown.
+	 * 
+	 * @param tokens
+	 *            - token stream
+	 * @param lexp
+	 *            - The classes of the current binary expression (e.g, addition
+	 *            -> multiplication).
+	 * @param nextMethod
+	 *            - next method to execute in the grammar
+	 */
 	private static Expression parseBinaryExp(Stream tokens,
 			Class<BinaryOp>[] lexp, String nextMethod) throws Exception {
 		Method nextParse = Expression.class.getDeclaredMethod(nextMethod,
@@ -128,6 +167,12 @@ public abstract class Expression {
 		return parseBinaryExp(tokens, dexp, "implicitOperations");
 	}
 
+	/**
+	 * Manages implicit multiplication.
+	 * 
+	 * @param tokens
+	 *            - token stream
+	 */
 	private static Expression implicitOperations(Stream tokens)
 			throws Exception {
 		Expression exp1 = parsePEXP(tokens);
@@ -148,6 +193,15 @@ public abstract class Expression {
 		return parseBinaryExp(tokens, pexp, "parseFEXP");
 	}
 
+	/**
+	 * Parse any function expression - anything that implements Funclass.
+	 * 
+	 * Uses dynamic reflection and instantiation to enable this. Functions
+	 * must precede a (brackets) operator
+	 * 
+	 * @param tokens
+	 *            - token stream
+	 */
 	private static Expression parseFEXP(Stream tokens) throws Exception {
 		Expression exp1 = parseVEXP(tokens);
 		if (!tokens.hasEnded() && exp1 instanceof Brackets) {
@@ -164,13 +218,17 @@ public abstract class Expression {
 								+ " provided");
 					}
 					tokens.next();
-					return (Expression) fn.newInstance((Brackets)exp1);
+					return (Expression) fn.newInstance((Brackets) exp1);
 				}
 			}
 		}
 		return exp1;
 	}
 
+	/**
+	 * Parse either numbers, Cell References, or brackets.
+	 * @param tokens - Token stream
+	 */
 	private static Expression parseVEXP(Stream tokens) throws Exception {
 		if (tokens.hasEnded())
 			throw new ParseException("Token stream ended unexpectedly");
@@ -214,6 +272,13 @@ public abstract class Expression {
 		return exp;
 	}
 
+	/**
+	 * Calculates the expression
+	 * @param expr - expression string
+	 * @param ws - worksheet
+	 * @return
+	 * @throws Exception
+	 */
 	public static Expression calculate(String expr, WorkSheet ws)
 			throws Exception {
 		worksheet = ws;
@@ -223,7 +288,7 @@ public abstract class Expression {
 		} catch (InstantiationException | IllegalAccessException
 				| InvocationTargetException | IllegalArgumentException
 				| NoSuchMethodException | SecurityException | ParseException e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return null;
 		}
 	}

@@ -103,6 +103,7 @@ public class SpreadsheetTest {
 					selectAndSet(4, 3, "3.3");
 					selectAndSet(5, 3, "SUM(C3,C4,C5)");
 					selectAndSet(6, 3, "MAX(C3,C4,C5)");
+					selectAndSet(7, 3, "fact(10)");
 					gui.functioneditor.updateWorksheet();
 
 				}
@@ -122,6 +123,9 @@ public class SpreadsheetTest {
 			assertEquals(
 					gui.worksheet.lookup(new CellIndex("C7", gui.worksheet))
 							.show(), "3.3");
+			assertEquals(
+					gui.worksheet.lookup(new CellIndex("C8", gui.worksheet))
+							.show(), "3628800.0");
 		} catch (InvocationTargetException e) {
 			fail();
 		} catch (InterruptedException e) {

@@ -14,10 +14,21 @@ import expressions.Brackets;
 import expressions.Expression;
 import expressions.ParseException;
 
+/**
+ * Executed during running.
+ * @author max
+ *
+ */
 public class Code {
 	static ArrayList<String> comparators = new ArrayList<String>(Arrays.asList(
 			"< =", "> =", "! =", "= =", "<", ">"));
-
+	
+	/**
+	 * Executes the code itself
+	 * @param variables - hashmap of current variables
+	 * @param ws - worksheet
+	 * @param code - the code itself
+	 */
 	public static double execute(HashMap<String, Object> variables,
 			WorkSheet ws, String code) throws Exception {
 		ArrayList<Object> toks = Tokenizer.tokenize(code);

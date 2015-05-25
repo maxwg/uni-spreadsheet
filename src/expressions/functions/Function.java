@@ -42,6 +42,11 @@ public class Function extends Expression implements FunctionOp {
 		this.paramCount = paramCount;
 	}
 
+	/**
+	 * returns a list of the functions
+	 * @param funcs - string listing the functions and their implementation
+	 * @param ws - worksheet
+	 */
 	public static ArrayList<Funclass> parseFunctions(String funcs, WorkSheet ws)
 			throws IOException, ParseException {
 		ArrayList<Object> toks = Tokenizer.tokenize(funcs);
